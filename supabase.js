@@ -173,9 +173,14 @@ async function handleLogin() {
 //  SIGN OUT
 // ============================================================
 async function handleSignOut() {
-  await db.auth.signOut();
+  // Show feedback instantly, sign out in background
+  currentUser = null;
+  currentProfile = null;
+  currentRole = null;
+  updateNav();
   showToast('Signed out successfully', 'success');
   showPage('home');
+  db.auth.signOut(); // fire and forget
 }
 
 // ============================================================
