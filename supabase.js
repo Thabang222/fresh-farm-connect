@@ -126,26 +126,19 @@ async function handleSignup() {
   const userId = data.user?.id;
   if (!userId) { showToast('Signup failed, please try again', 'error'); return; }
 
+  // Trigger already created the profile row — just update the extra fields
+  await new Promise(r => setTimeout(r, 800));
+
   if (role === 'farmer') {
-    const { error: dbErr } = await db.from('farmers').insert({
-      id:             userId,
-      name:           name,
-      farm_name:      farmName,
-      email:          email,
+    await db.from('farmers').update({
       phone:          phone || null,
       location:       farmLocation || null,
       what_they_grow: farmProducts || null,
-      joined_year:    new Date().getFullYear(),
-    });
-    if (dbErr) { showToast('Profile save failed: ' + dbErr.message, 'error'); return; }
+    }).eq('id', userId);
   } else {
-    const { error: dbErr } = await db.from('buyers').insert({
-      id:    userId,
-      name:  name,
-      email: email,
-      phone: phone || null,
-    });
-    if (dbErr) { showToast('Profile save failed: ' + dbErr.message, 'error'); return; }
+    if (phone) {
+      await db.from('buyers').update({ phone }).eq('id', userId);
+    }
   }
 
   showToast('Welcome to Fresh Farm Connect! 🌿', 'success');
