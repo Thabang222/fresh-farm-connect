@@ -4,7 +4,7 @@
 // ============================================================
 
 // ⚠️  REPLACE WITH YOUR EMAIL ADDRESS
-const ADMIN_EMAIL = 'your@email.com';
+const ADMIN_EMAIL = 'thabangsereo07@';
 
 // ============================================================
 //  ADMIN AUTH — Check admin access on load
