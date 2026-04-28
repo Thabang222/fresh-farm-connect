@@ -503,37 +503,89 @@
   <div class="page-content">
     <h1 style="font-family:var(--font-display);font-size:28px;color:var(--gray-900);margin-bottom:24px">My Account</h1>
     <div class="profile-layout">
+
+      <!-- SIDEBAR -->
       <div class="profile-sidebar">
-        <div class="profile-avatar">👤</div>
-        <div class="profile-name">Sipho Mokoena</div>
-        <div class="profile-email">sipho@email.com</div>
-        <div style="margin-bottom:16px"><span class="badge badge-green">Verified buyer</span></div>
+        <div class="profile-avatar" id="profile-avatar-icon">👤</div>
+        <div class="profile-name" id="profile-display-name">Loading…</div>
+        <div class="profile-email" id="profile-display-email" style="font-size:13px;color:var(--gray-500);margin-bottom:8px"></div>
+        <div style="margin-bottom:16px"><span class="badge badge-green" id="profile-role-badge">Buyer</span></div>
         <div class="profile-menu">
-          <div class="profile-menu-item active">📦 My Orders</div>
-          <div class="profile-menu-item">❤️ Saved items</div>
-          <div class="profile-menu-item">📍 Addresses</div>
-          <div class="profile-menu-item">⚙️ Settings</div>
-          <div class="profile-menu-item" style="color:var(--red-500)" onclick="handleSignOut()">↪ Sign out</div>
+          <div class="profile-menu-item active" id="tab-orders" onclick="switchProfileTab('orders')">📦 My Orders <span id="orders-count-badge" style="margin-left:auto;background:var(--green-600);color:white;border-radius:99px;font-size:11px;padding:1px 7px;display:none"></span></div>
+          <div class="profile-menu-item" id="tab-addresses" onclick="switchProfileTab('addresses')">📍 Addresses</div>
+          <div class="profile-menu-item" id="tab-settings" onclick="switchProfileTab('settings')">⚙️ Settings</div>
+          <div class="profile-menu-item" style="color:var(--red-500);margin-top:8px" onclick="handleSignOut()">↪ Sign out</div>
         </div>
       </div>
-      <div>
-        <div class="section-card" style="margin-bottom:16px">
+
+      <!-- MAIN CONTENT -->
+      <div id="profile-main-content">
+
+        <!-- ORDERS TAB -->
+        <div id="profile-tab-orders" class="section-card">
           <div class="section-card-title">My Orders</div>
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--gray-50);border-radius:var(--radius-sm)">
-              <div><div style="font-weight:600;font-size:14px;color:var(--gray-900)">#1043 — Tomatoes, Eggs</div><div style="font-size:12px;color:var(--gray-500);margin-top:2px">Green Valley Farm · Today</div><div style="font-size:13px;color:var(--green-700);margin-top:4px;font-weight:500">R209.00 total</div></div>
-              <span class="badge badge-blue">In progress</span>
+          <div id="orders-list"><div style="text-align:center;padding:32px;color:var(--gray-400)">Loading orders…</div></div>
+        </div>
+
+        <!-- ADDRESSES TAB -->
+        <div id="profile-tab-addresses" class="section-card hidden">
+          <div class="section-card-title">Delivery Address</div>
+          <div class="form-group" style="margin-top:12px">
+            <label class="label">Full delivery address</label>
+            <textarea id="settings-address" class="input" rows="3" placeholder="e.g. 12 Main Street, Sandton, Johannesburg, 2196" style="resize:vertical"></textarea>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group">
+              <label class="label">Province</label>
+              <select id="settings-province" class="input">
+                <option value="">Select province</option>
+                <option>Gauteng</option><option>Western Cape</option><option>KwaZulu-Natal</option>
+                <option>Eastern Cape</option><option>Limpopo</option><option>Mpumalanga</option>
+                <option>North West</option><option>Free State</option><option>Northern Cape</option>
+              </select>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--gray-50);border-radius:var(--radius-sm)">
-              <div><div style="font-weight:600;font-size:14px;color:var(--gray-900)">#1038 — Spinach, Honey</div><div style="font-size:12px;color:var(--gray-500);margin-top:2px">Sunrise Organics · Last week</div><div style="font-size:13px;color:var(--green-700);margin-top:4px;font-weight:500">R180.00 total</div></div>
-              <span class="badge badge-green">Delivered</span>
+            <div class="form-group">
+              <label class="label">Phone number</label>
+              <input id="settings-phone" class="input" type="tel" placeholder="082 000 0000" />
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--gray-50);border-radius:var(--radius-sm)">
-              <div><div style="font-weight:600;font-size:14px;color:var(--gray-900)">#1032 — Avocados, Basil</div><div style="font-size:12px;color:var(--gray-500);margin-top:2px">Avo Grove · 2 weeks ago</div><div style="font-size:13px;color:var(--green-700);margin-top:4px;font-weight:500">R140.00 total</div></div>
-              <span class="badge badge-green">Delivered</span>
+          </div>
+          <button class="btn btn-primary" style="margin-top:8px" onclick="saveAddressSettings()">Save address</button>
+        </div>
+
+        <!-- SETTINGS TAB -->
+        <div id="profile-tab-settings" class="section-card hidden">
+          <div class="section-card-title">Account Settings</div>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:14px">
+            <div class="form-group">
+              <label class="label">Full name</label>
+              <input id="settings-name" class="input" type="text" placeholder="Your name" />
+            </div>
+            <div class="form-group">
+              <label class="label">Email address</label>
+              <input class="input" type="email" id="settings-email" disabled style="opacity:0.6;cursor:not-allowed" />
+            </div>
+            <div id="farmer-settings-fields" class="hidden">
+              <div class="form-group" style="margin-bottom:12px">
+                <label class="label">Farm name</label>
+                <input id="settings-farm-name" class="input" type="text" placeholder="Your farm name" />
+              </div>
+              <div class="form-group" style="margin-bottom:12px">
+                <label class="label">Location</label>
+                <input id="settings-location" class="input" type="text" placeholder="e.g. Mpumalanga" />
+              </div>
+              <div class="form-group">
+                <label class="label">What you grow</label>
+                <input id="settings-what-they-grow" class="input" type="text" placeholder="e.g. Tomatoes, Spinach" />
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveAccountSettings()">Save changes</button>
+            <div style="border-top:1px solid var(--gray-100);padding-top:16px;margin-top:4px">
+              <div style="font-size:14px;font-weight:600;color:var(--gray-900);margin-bottom:8px">Change password</div>
+              <button class="btn btn-outline" onclick="sendPasswordReset()">Send password reset email</button>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
