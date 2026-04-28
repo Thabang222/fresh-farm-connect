@@ -25,8 +25,14 @@ async function initAuth() {
   db.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session?.user) {
       currentUser = session.user;
+      await handleOAuthRedirect();
       await resolveProfile(session.user);
       updateNav();
+      // If redirected back from Google, go to marketplace
+      if (window.location.hash.includes('access_token')) {
+        showPage('marketplace');
+        showToast('Welcome! 👋', 'success');
+      }
     } else if (event === 'SIGNED_OUT') {
       currentUser = null;
       currentProfile = null;
@@ -292,4 +298,40 @@ async function deleteFarmerListing(id) {
     .eq('farmer_id', currentUser.id);
   if (error) showToast('Delete failed: ' + error.message, 'error');
   return !error;
+}
+
+// ============================================================
+//  GOOGLE SIGN IN
+// ============================================================
+async function handleGoogleSignIn() {
+  const { error } = await db.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin,
+    }
+  });
+  if (error) showToast(error.message, 'error');
+}
+
+// Handle Google redirect — create profile row if first time
+async function handleOAuthRedirect() {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session?.user) return;
+
+  const user = session.user;
+
+  // Check if profile already exists
+  const { data: farmer } = await db.from('farmers').select('id').eq('id', user.id).single();
+  if (farmer) return; // already set up
+
+  const { data: buyer } = await db.from('buyers').select('id').eq('id', user.id).single();
+  if (buyer) return; // already set up
+
+  // First time Google user — create buyer profile by default
+  const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0];
+  await db.from('buyers').insert({
+    id:    user.id,
+    name:  name,
+    email: user.email,
+  });
 }
