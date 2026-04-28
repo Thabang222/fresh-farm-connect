@@ -270,7 +270,7 @@ function initCheckoutMap() {
     // Click map to drop delivery pin
     checkoutMap.on('click', e => {
       placeDeliveryMarker([e.latlng.lat, e.latlng.lng]);
-      reverseGeocode(e.latlng.lat, e.latlng.lng);
+      reverseGeocode(e.latlng.lat, e.latlng.lng, true); // true = auto save
     });
 
     // Wire up address search input
@@ -296,14 +296,14 @@ function placeDeliveryMarker(latlng) {
   deliveryMarker.on('dragend', e => {
     const pos = e.target.getLatLng();
     selectedDelivery = { lat: pos.lat, lng: pos.lng };
-    reverseGeocode(pos.lat, pos.lng);
+    reverseGeocode(pos.lat, pos.lng, true); // true = auto save
   });
 
   selectedDelivery = { lat: latlng[0], lng: latlng[1] };
 }
 
 // Free reverse geocoding via OpenStreetMap Nominatim
-async function reverseGeocode(lat, lng) {
+async function reverseGeocode(lat, lng, autoSave = false) {
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
@@ -315,8 +315,40 @@ async function reverseGeocode(lat, lng) {
     if (input)   input.value = address;
     if (display) display.textContent = address;
     if (selectedDelivery) selectedDelivery.address = address;
+    if (autoSave) await autoSaveDeliveryAddress(address);
   } catch (e) {
     console.warn('Reverse geocode failed:', e);
+  }
+}
+
+// Auto-save delivery address to Supabase buyers table
+async function autoSaveDeliveryAddress(address) {
+  if (typeof currentUser === 'undefined' || !currentUser) return;
+  if (typeof db === 'undefined') return;
+
+  try {
+    const table = (typeof currentRole !== 'undefined' && currentRole === 'farmer') ? 'farmers' : 'buyers';
+    const { error } = await db.from(table)
+      .update({ delivery_address: address })
+      .eq('id', currentUser.id);
+
+    if (!error) {
+      if (typeof currentProfile !== 'undefined' && currentProfile) {
+        currentProfile.delivery_address = address;
+      }
+      // Show subtle confirmation
+      const display = document.getElementById('delivery-address-display');
+      if (display) {
+        display.style.color = 'var(--green-600)';
+        display.textContent = '✅ ' + address + ' — saved!';
+        setTimeout(() => {
+          display.style.color = '';
+          display.textContent = address;
+        }, 2500);
+      }
+    }
+  } catch (e) {
+    console.warn('Auto-save address failed:', e);
   }
 }
 
@@ -353,6 +385,7 @@ async function searchDeliveryAddress(query) {
         const display = document.getElementById('delivery-address-display');
         if (input)   input.value = query;
         if (display) display.textContent = query;
+        await autoSaveDeliveryAddress(query);
         return; // success — stop trying
       }
     } catch (e) {
