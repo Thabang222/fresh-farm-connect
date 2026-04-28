@@ -107,7 +107,17 @@ async function handleSignup() {
   const btn = document.getElementById('signup-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Creating account…'; }
 
-  const { data, error } = await db.auth.signUp({ email, password });
+  const { data, error } = await db.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        role,
+        name,
+        farm_name: farmName || null,
+      }
+    }
+  });
 
   if (btn) { btn.disabled = false; btn.textContent = 'Create account'; }
 
