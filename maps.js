@@ -321,27 +321,47 @@ async function reverseGeocode(lat, lng) {
 }
 
 // Free forward geocoding via OpenStreetMap Nominatim
+// Tries progressively simpler versions of the address for best results
 async function searchDeliveryAddress(query) {
   if (!query) return;
-  try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&countrycodes=za&limit=1`
-    );
-    const data = await res.json();
-    if (data && data[0]) {
-      const lat = parseFloat(data[0].lat);
-      const lng = parseFloat(data[0].lon);
-      placeDeliveryMarker([lat, lng]);
-      checkoutMap.setView([lat, lng], 16);
-      if (selectedDelivery) selectedDelivery.address = data[0].display_name;
-      const display = document.getElementById('delivery-address-display');
-      if (display) display.textContent = data[0].display_name;
-    } else {
-      showToast('Address not found, try clicking on the map', 'error');
+
+  // Build a list of queries to try — from specific to general
+  const attempts = [
+    query,
+    // Strip unit/flat numbers and building names (first word often)
+    query.replace(/^[^,]+,\s*/, ''),
+    // Just street + city
+    query.split(',').slice(-3).join(',').trim(),
+    // Just city + postal code
+    query.split(',').slice(-2).join(',').trim(),
+  ].filter((q, i, arr) => q && arr.indexOf(q) === i); // deduplicate
+
+  for (const attempt of attempts) {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(attempt)}&format=json&countrycodes=za&limit=1&addressdetails=1`
+      );
+      const data = await res.json();
+      if (data && data[0]) {
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        placeDeliveryMarker([lat, lng]);
+        checkoutMap.setView([lat, lng], 16);
+        const address = data[0].display_name;
+        if (selectedDelivery) selectedDelivery.address = query; // keep original
+        const input   = document.getElementById('delivery-address-input');
+        const display = document.getElementById('delivery-address-display');
+        if (input)   input.value = query;
+        if (display) display.textContent = query;
+        return; // success — stop trying
+      }
+    } catch (e) {
+      console.warn('Geocode attempt failed:', e);
     }
-  } catch (e) {
-    console.warn('Geocode failed:', e);
   }
+
+  // All attempts failed — show helpful message
+  showToast('Address not found. Try typing just the street name or click directly on the map 📍', 'error');
 }
 
 // ============================================================
