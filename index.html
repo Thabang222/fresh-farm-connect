@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fresh Farm Connect</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo" onclick="showPage('home')">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" style="fill:#fff"/><path d="M17 8c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2s2-.9 2-2v-4c0-1.1-.9-2-2-2zM7 8c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2s2-.9 2-2v-4c0-1.1-.9-2-2-2z" style="fill:none"/></svg>
+        <span style="color:#fff;font-size:18px">🌿</span>
+      </div>
+      Fresh Farm Connect
+    </div>
+    <div class="nav-links">
+      <button class="nav-link" onclick="showPage('marketplace')">Shop</button>
+      <button class="nav-link" onclick="showPage('farmers')">Farmers</button>
+      <button id="nav-dashboard-btn" class="nav-link" onclick="showPage('dashboard')">My Farm</button>
+      <button id="nav-signin-btn" class="nav-link" onclick="showPage('login')">Sign in</button>
+      <button id="nav-user-btn" class="nav-link hidden" onclick="showPage('profile')">👤 <span id="nav-user-label">Account</span></button>
+      <button class="nav-link nav-cart" onclick="showPage('cart')">
+        🛒
+        <span class="cart-badge hidden" id="cart-badge">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- COMMISSION BANNER -->
+<div class="commission-banner">
+  <div class="commission-inner">
+    <div class="commission-title">How we earn:</div>
+    <div class="commission-items">
+      <div class="commission-item"><div class="commission-dot"></div> 8% commission on every sale</div>
+      <div class="commission-item"><div class="commission-dot"></div> R45 base delivery fee per order</div>
+      <div class="commission-item"><div class="commission-dot"></div> Farmers keep 92% of their sale price</div>
+      <div class="commission-item"><div class="commission-dot"></div> PayFast processes all payments securely</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== HOME ========== -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-grid">
+        <div>
+          <h1 class="hero-title">Fresh From <span>Farm</span> to Your Table</h1>
+          <p class="hero-sub">Connect directly with local South African farmers. Order fresh, organic fruits and vegetables. Support sustainable agriculture while enjoying premium quality produce.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="showPage('marketplace')" style="padding:12px 28px;font-size:15px">Start Shopping</button>
+            <button class="btn btn-outline" onclick="showPage('signup')" style="padding:12px 28px;font-size:15px">Join as Farmer</button>
+          </div>
+          <div class="hero-stats">
+            <div><div class="hero-stat-val">150+</div><div class="hero-stat-lbl">Local farmers</div></div>
+            <div><div class="hero-stat-val">2,400+</div><div class="hero-stat-lbl">Happy buyers</div></div>
+            <div><div class="hero-stat-val">48hr</div><div class="hero-stat-lbl">Farm to door</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="hero-visual">
+            <div class="hero-map-mock">
+              <div style="font-size:36px;margin-bottom:8px">🗺️</div>
+              <div style="font-size:13px;color:var(--gray-500)">Farms near Johannesburg</div>
+              <div class="map-pin" style="top:40%;left:45%"></div>
+              <div class="map-pin" style="top:60%;left:60%"></div>
+              <div class="map-pin" style="top:30%;left:70%"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div style="background:var(--green-50);border-radius:var(--radius-sm);padding:12px">
+                <div style="font-size:22px;margin-bottom:4px">🍅</div>
+                <div style="font-size:13px;font-weight:600;color:var(--gray-900)">Roma Tomatoes</div>
+                <div style="font-size:12px;color:var(--green-700);font-weight:500">R22/kg</div>
+              </div>
+              <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:12px">
+                <div style="font-size:22px;margin-bottom:4px">🥬</div>
+                <div style="font-size:13px;font-weight:600;color:var(--gray-900)">Baby Spinach</div>
+                <div style="font-size:12px;color:var(--green-700);font-weight:500">R35/bag</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1200px;margin:0 auto;padding:48px 20px">
+    <div class="how-cards">
+      <div class="how-card">
+        <div class="how-icon">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <div class="how-title">Browse & discover</div>
+        <div class="how-text">Search fresh produce from verified local farmers in your area using our interactive map.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </div>
+        <div class="how-title">Order & pay securely</div>
+        <div class="how-text">Add to cart and checkout via PayFast — card, EFT, or SnapScan. Transparent pricing with 8% commission and R45 delivery.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">
+          <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <div class="how-title">Receive fresh produce</div>
+        <div class="how-text">Track your delivery on the map. Farmers harvest within 48 hours of your order for maximum freshness.</div>
+      </div>
+    </div>
+
+    <!-- FEATURED SECTION -->
+    <div style="margin-top:48px">
+      <div class="market-header">
+        <h2 style="font-family:var(--font-display);font-size:26px;color:var(--gray-900)">Fresh this week</h2>
+        <button class="btn btn-outline btn-sm" onclick="showPage('marketplace')">View all →</button>
+      </div>
+      <div class="products-grid" id="featured-grid"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">🌿 Fresh Farm Connect</div>
+          <div class="footer-desc">Connecting South African farmers directly to buyers. Fresh produce, fair prices, and community support — all in one platform.</div>
+        </div>
+        <div>
+          <div class="footer-heading">Platform</div>
+          <div class="footer-link" onclick="showPage('marketplace')">Marketplace</div>
+          <div class="footer-link" onclick="showPage('farmers')">Our Farmers</div>
+          <div class="footer-link" onclick="showPage('signup')">Sell on FFC</div>
+        </div>
+        <div>
+          <div class="footer-heading">How we earn</div>
+          <div class="footer-link">8% sales commission</div>
+          <div class="footer-link">R45 delivery fee</div>
+          <div class="footer-link">PayFast payments</div>
+        </div>
+        <div>
+          <div class="footer-heading">Support</div>
+          <div class="footer-link">WhatsApp us</div>
+          <div class="footer-link">Email support</div>
+          <div class="footer-link">Privacy policy</div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>© 2025 Fresh Farm Connect. All rights reserved.</div>
+        <div>Made with ❤️ for SA farmers</div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ========== MARKETPLACE ========== -->
+<div id="page-marketplace" class="page">
+  <div class="page-content">
+    <div class="market-header">
+      <h1 class="market-title">Fresh Produce Marketplace</h1>
+      <div style="font-size:13px;color:var(--gray-500)">Harvested within 48 hours</div>
+    </div>
+
+    <!-- MAP -->
+    <div class="map-section">
+      <div class="section-card" style="padding:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-weight:600;font-size:14px;color:var(--gray-800)">🗺️ Farms near you — Johannesburg</div>
+          <span class="badge badge-green">Google Maps API required for live map</span>
+        </div>
+        <div class="map-container">
+          <div style="width:100%;height:100%;background:linear-gradient(135deg,#e8f5e9 0%,#c8e6c9 50%,#a5d6a7 100%);position:relative;overflow:hidden">
+            <!-- Simulated map grid -->
+            <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.15" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <line x1="25" y1="0" x2="25" y2="100" stroke="#388e3c" stroke-width="0.5"/>
+              <line x1="50" y1="0" x2="50" y2="100" stroke="#388e3c" stroke-width="0.5"/>
+              <line x1="75" y1="0" x2="75" y2="100" stroke="#388e3c" stroke-width="0.5"/>
+              <line x1="0" y1="33" x2="100" y2="33" stroke="#388e3c" stroke-width="0.5"/>
+              <line x1="0" y1="66" x2="100" y2="66" stroke="#388e3c" stroke-width="0.5"/>
+            </svg>
+            <!-- Demo pins -->
+            <div class="demo-pin" style="top:35%;left:40%">
+              <div class="demo-pin-label">Green Valley Farm</div>
+              <div class="demo-pin-dot"></div>
+            </div>
+            <div class="demo-pin" style="top:55%;left:60%">
+              <div class="demo-pin-label">Sunrise Organics</div>
+              <div class="demo-pin-dot"></div>
+            </div>
+            <div class="demo-pin" style="top:25%;left:65%">
+              <div class="demo-pin-label">Happy Hen Farm</div>
+              <div class="demo-pin-dot"></div>
+            </div>
+            <div class="demo-pin" style="top:65%;left:28%">
+              <div class="demo-pin-label">Golden Hive</div>
+              <div class="demo-pin-dot"></div>
+            </div>
+            <div style="position:absolute;bottom:12px;right:12px;background:white;border-radius:8px;padding:8px 12px;font-size:12px;color:var(--gray-600);box-shadow:var(--shadow)">📍 Connect Google Maps API to activate live map</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="input" type="text" placeholder="Search produce or farmers..." id="market-search" oninput="filterProducts()" />
+      </div>
+      <button class="btn btn-primary">Search</button>
+    </div>
+
+    <div class="filter-row" id="filter-row">
+      <button class="filter-chip active" onclick="setFilter('All',this)">All</button>
+      <button class="filter-chip" onclick="setFilter('Vegetables',this)">Vegetables</button>
+      <button class="filter-chip" onclick="setFilter('Fruits',this)">Fruits</button>
+      <button class="filter-chip" onclick="setFilter('Dairy',this)">Dairy & Eggs</button>
+      <button class="filter-chip" onclick="setFilter('Grains',this)">Grains</button>
+      <button class="filter-chip" onclick="setFilter('Herbs',this)">Herbs</button>
+    </div>
+
+    <div class="products-grid" id="products-grid"></div>
+    <div id="no-results" class="hidden" style="text-align:center;padding:60px;color:var(--gray-400)">
+      <div style="font-size:48px;margin-bottom:12px">🔍</div>
+      <div style="font-size:16px;font-weight:500">No produce found</div>
+      <div style="font-size:13px;margin-top:6px">Try adjusting your search or filters</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== FARMERS ========== -->
+<div id="page-farmers" class="page">
+  <div class="page-content">
+    <div class="market-header">
+      <h1 class="market-title">Local Farmers</h1>
+      <div style="font-size:13px;color:var(--gray-500)">Verified producers across South Africa</div>
+    </div>
+    <div class="farmers-grid" id="farmers-grid"></div>
+  </div>
+</div>
+
+<!-- ========== CART ========== -->
+<div id="page-cart" class="page">
+  <div class="page-content">
+    <h1 style="font-family:var(--font-display);font-size:28px;color:var(--gray-900);margin-bottom:24px">Shopping Cart</h1>
+    <div id="cart-empty" class="cart-empty">
+      <div class="cart-empty-icon">🛒</div>
+      <div style="font-size:20px;font-weight:600;color:var(--gray-800);margin-bottom:8px">Your cart is empty</div>
+      <div style="color:var(--gray-500);margin-bottom:20px">Start adding fresh produce from local farmers</div>
+      <button class="btn btn-primary" onclick="showPage('marketplace')">Browse Marketplace</button>
+    </div>
+    <div id="cart-content" class="hidden">
+      <div class="cart-layout">
+        <div id="cart-items-list"></div>
+        <div>
+          <div class="order-summary">
+            <div class="summary-title">Order Summary</div>
+            <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">R0</span></div>
+            <div class="summary-row commission-row"><span>Platform commission (8%)</span><span id="sum-commission">R0</span></div>
+            <div class="summary-row"><span>Delivery fee</span><span id="sum-delivery">R45</span></div>
+            <div class="summary-row total"><span>Total</span><span id="sum-total">R0</span></div>
+            <div class="summary-note">💡 8% commission supports our platform. Farmers receive 92% of the sale price. Delivery fee covers logistics from farm to your door.</div>
+            <button class="btn btn-primary" style="width:100%;margin-top:16px;padding:12px" onclick="showPage('checkout')">Proceed to Checkout</button>
+            <button class="btn btn-outline" style="width:100%;margin-top:8px" onclick="showPage('marketplace')">Continue Shopping</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== CHECKOUT ========== -->
+<div id="page-checkout" class="page">
+  <div class="page-content">
+    <h1 style="font-family:var(--font-display);font-size:28px;color:var(--gray-900);margin-bottom:24px">Checkout</h1>
+    <div class="checkout-layout">
+      <div>
+        <!-- Delivery Address -->
+        <div class="card" style="padding:20px;margin-bottom:16px">
+          <div style="font-weight:600;font-size:15px;margin-bottom:16px;color:var(--gray-900)">📍 Delivery Address</div>
+          <div class="map-delivery">
+            <div style="font-size:32px">🗺️</div>
+            <div style="font-size:13px;color:var(--gray-500)">Drop a pin on Google Maps for delivery</div>
+            <div style="font-size:11px;color:var(--gray-400)">(Google Maps API required for live pin drop)</div>
+          </div>
+          <div class="form-group">
+            <label class="label">Street address</label>
+            <input class="input" type="text" placeholder="123 Main Street" />
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group"><label class="label">City</label><input class="input" type="text" placeholder="Johannesburg" /></div>
+            <div class="form-group"><label class="label">Province</label><input class="input" type="text" placeholder="Gauteng" /></div>
+          </div>
+          <div class="form-group"><label class="label">Phone number</label><input class="input" type="tel" placeholder="082 000 0000" /></div>
+        </div>
+
+        <!-- Payment -->
+        <div class="card" style="padding:20px;margin-bottom:16px">
+          <div style="font-weight:600;font-size:15px;margin-bottom:16px;color:var(--gray-900)">💳 Payment Method</div>
+          <div class="payment-methods">
+            <div class="payment-method active" onclick="selectPayment(this)">💳 Card</div>
+            <div class="payment-method" onclick="selectPayment(this)">🏦 EFT</div>
+            <div class="payment-method" onclick="selectPayment(this)">📱 SnapScan</div>
+          </div>
+          <div class="form-group"><label class="label">Card number</label><input class="input" type="text" placeholder="4242 4242 4242 4242" /></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group"><label class="label">Expiry</label><input class="input" type="text" placeholder="MM/YY" /></div>
+            <div class="form-group"><label class="label">CVV</label><input class="input" type="text" placeholder="123" /></div>
+          </div>
+          <div style="background:var(--green-50);border-radius:var(--radius-sm);padding:10px;font-size:12px;color:var(--green-700);margin-top:8px">🔒 Secured by PayFast. Your payment details are encrypted and never stored.</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="order-summary">
+          <div class="summary-title">Order Summary</div>
+          <div id="checkout-items" style="margin-bottom:12px;font-size:13px;color:var(--gray-600)"></div>
+          <hr class="divider" />
+          <div class="summary-row"><span>Subtotal</span><span id="co-subtotal">R0</span></div>
+          <div class="summary-row commission-row"><span>Commission (8%)</span><span id="co-commission">R0</span></div>
+          <div class="summary-row"><span>Delivery fee</span><span>R45</span></div>
+          <div class="summary-row total"><span>Total</span><span id="co-total">R0</span></div>
+          <button class="btn btn-primary" style="width:100%;margin-top:16px;padding:12px" onclick="placeOrder()">Pay via PayFast →</button>
+          <div class="summary-note" style="margin-top:10px">By placing your order you agree to our terms. Farmers receive 92% of the sale price after our 8% platform commission.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ORDER CONFIRMATION ========== -->
+<div id="page-confirmation" class="page">
+  <div class="page-content" style="max-width:560px">
+    <div class="card" style="padding:40px;text-align:center">
+      <div style="font-size:56px;margin-bottom:16px">✅</div>
+      <h1 style="font-family:var(--font-display);font-size:26px;color:var(--green-700);margin-bottom:8px">Order Confirmed!</h1>
+      <p style="color:var(--gray-500);margin-bottom:20px">Your fresh produce is being prepared by the farmer</p>
+      <div style="background:var(--green-50);border-radius:var(--radius);padding:16px;margin-bottom:20px">
+        <div style="font-size:22px;font-weight:700;color:var(--green-800);font-family:var(--font-display)">Order #1044</div>
+        <div style="font-size:13px;color:var(--green-600);margin-top:4px">Estimated delivery: 2–4 hours</div>
+      </div>
+
+      <div class="tracking-steps" style="text-align:left">
+        <div class="tracking-step">
+          <div class="step-indicator"><div class="step-dot done"></div><div class="step-line done"></div></div>
+          <div class="step-content"><div class="step-title">Order placed</div><div class="step-time">Just now</div></div>
+        </div>
+        <div class="tracking-step">
+          <div class="step-indicator"><div class="step-dot active"></div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Farmer confirmed</div><div class="step-time">Awaiting confirmation</div></div>
+        </div>
+        <div class="tracking-step">
+          <div class="step-indicator"><div class="step-dot pending"></div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Out for delivery</div><div class="step-time">Estimated 2–4 hours</div></div>
+        </div>
+        <div class="tracking-step">
+          <div class="step-indicator"><div class="step-dot pending"></div></div>
+          <div class="step-content"><div class="step-title">Delivered</div><div class="step-time">—</div></div>
+        </div>
+      </div>
+
+      <div style="background:var(--gray-50);border-radius:var(--radius);padding:14px;margin-top:16px;text-align:left">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Contact your farmer</div>
+        <div style="font-size:13px;color:var(--gray-500)">WhatsApp Thabo Nkosi: 082 000 0000</div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn btn-primary" style="flex:1" onclick="showPage('marketplace')">Continue Shopping</button>
+        <button class="btn btn-outline" style="flex:1" onclick="showPage('profile')">View Orders</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== FARMER DASHBOARD ========== -->
+<div id="page-dashboard" class="page">
+  <div class="page-content">
+    <div class="dashboard-header">
+      <div>
+        <div class="dashboard-title">Farm Dashboard</div>
+        <div style="font-size:13px;color:var(--gray-500);margin-top:2px">Green Valley Farm · Mpumalanga</div>
+      </div>
+      <button class="btn btn-primary" onclick="showModal('add-listing-modal')">+ Add listing</button>
+    </div>
+
+    <!-- Commission info -->
+    <div class="commission-box">
+      <div class="commission-box-title">💰 How your earnings work</div>
+      <table class="commission-table">
+        <tr><td>Your listing price</td><td>R100.00</td></tr>
+        <tr><td>Platform commission (8%)</td><td>−R8.00</td></tr>
+        <tr><td>PayFast processing (~3.5%)</td><td>−R3.50</td></tr>
+        <tr><td style="font-weight:600;color:var(--green-800)">You receive</td><td style="font-weight:700;color:var(--green-800)">~R88.50</td></tr>
+      </table>
+      <div style="font-size:11px;color:var(--green-600);margin-top:8px">Delivery fee (R45/order) goes to logistics — not deducted from your earnings.</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Revenue this month</div><div class="stat-value">R8,420</div><div class="stat-delta">↑ 12% vs last month</div></div>
+      <div class="stat-card"><div class="stat-label">Total orders</div><div class="stat-value">47</div><div class="stat-delta">↑ 5 this week</div></div>
+      <div class="stat-card"><div class="stat-label">Active listings</div><div class="stat-value">12</div><div class="stat-delta">3 low in stock</div></div>
+      <div class="stat-card"><div class="stat-label">Customer rating</div><div class="stat-value">4.9 ⭐</div><div class="stat-delta">38 reviews</div></div>
+    </div>
+
+    <div class="dashboard-grid">
+      <!-- Recent Orders -->
+      <div class="section-card">
+        <div class="section-card-title">Recent Orders <span class="badge badge-amber">3 pending</span></div>
+        <table class="orders-table">
+          <thead><tr><th>Order</th><th>Buyer</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>#1042</td><td>Sipho M.</td><td>R245</td><td><span class="badge badge-green">Delivered</span></td></tr>
+            <tr><td>#1041</td><td>Anele K.</td><td>R180</td><td><span class="badge badge-blue">Processing</span></td></tr>
+            <tr><td>#1040</td><td>Fatima D.</td><td>R310</td><td><span class="badge badge-amber">Pending</span></td></tr>
+            <tr><td>#1039</td><td>Thabo N.</td><td>R95</td><td><span class="badge badge-green">Delivered</span></td></tr>
+            <tr><td>#1038</td><td>Nomsa K.</td><td>R420</td><td><span class="badge badge-amber">Pending</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- My Listings -->
+      <div class="section-card">
+        <div class="section-card-title">My Listings</div>
+        <div id="farmer-listings"></div>
+      </div>
+    </div>
+
+    <!-- Farm Map -->
+    <div class="section-card" style="margin-top:20px">
+      <div class="section-card-title">Your farm location</div>
+      <div class="map-container" style="height:200px">
+        <div style="width:100%;height:100%;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px">
+          <div style="font-size:32px">📍</div>
+          <div style="font-size:13px;color:var(--gray-600)">Green Valley Farm, Mpumalanga</div>
+          <div style="font-size:11px;color:var(--gray-400)">Connect Google Maps API to show exact location</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== LOGIN ========== -->
+<div id="page-login" class="page">
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo"><div style="font-size:36px">🌿</div></div>
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to Fresh Farm Connect</div>
+      <div class="auth-toggle">
+        <button class="auth-toggle-btn active" data-role="buyer" onclick="toggleAuthRole(this,'buyer')">Buyer</button>
+        <button class="auth-toggle-btn" data-role="farmer" onclick="toggleAuthRole(this,'farmer')">Farmer</button>
+      </div>
+      <div class="form-group"><label class="label">Email address</label><input id="login-email" class="input" type="email" placeholder="you@email.com" /></div>
+      <div class="form-group"><label class="label">Password</label><input id="login-password" class="input" type="password" placeholder="••••••••" /></div>
+      <div style="text-align:right;margin-bottom:16px"><a style="font-size:13px;color:var(--green-600);cursor:pointer" onclick="handleForgotPassword()">Forgot password?</a></div>
+      <button id="login-btn" class="btn btn-primary" style="width:100%;padding:12px" onclick="handleLogin()">Sign in</button>
+      <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-500)">Don't have an account? <a style="color:var(--green-600);cursor:pointer" onclick="showPage('signup')">Sign up</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SIGNUP ========== -->
+<div id="page-signup" class="page">
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo"><div style="font-size:36px">🌿</div></div>
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">Join the Fresh Farm Connect community</div>
+      <div class="auth-toggle">
+        <button class="auth-toggle-btn active" data-role="buyer" onclick="toggleAuthRole(this,'buyer')">Buyer</button>
+        <button class="auth-toggle-btn" data-role="farmer" onclick="toggleAuthRole(this,'farmer')">Farmer</button>
+      </div>
+      <div class="form-group"><label class="label">Full name</label><input id="signup-name" class="input" type="text" placeholder="Your name" /></div>
+      <div class="form-group"><label class="label">Email address</label><input id="signup-email" class="input" type="email" placeholder="you@email.com" /></div>
+      <div class="form-group"><label class="label">Phone number</label><input id="signup-phone" class="input" type="tel" placeholder="082 000 0000" /></div>
+      <div id="farmer-extra-fields" class="hidden">
+        <div class="form-group"><label class="label">Farm name</label><input id="signup-farm-name" class="input" type="text" placeholder="e.g. Green Valley Farm" /></div>
+        <div class="form-group"><label class="label">Province / Location</label><input id="signup-farm-location" class="input" type="text" placeholder="e.g. Mpumalanga" /></div>
+        <div class="form-group"><label class="label">What do you grow?</label><input id="signup-farm-products" class="input" type="text" placeholder="e.g. Tomatoes, Spinach, Eggs" /></div>
+        <div style="background:var(--amber-400);border-radius:var(--radius-sm);padding:10px;font-size:12px;color:white;margin-bottom:14px">⚠️ As a farmer you agree to our 8% commission on all sales. Farmers keep 92% of their listed price.</div>
+      </div>
+      <div class="form-group"><label class="label">Password</label><input id="signup-password" class="input" type="password" placeholder="At least 8 characters" /></div>
+      <button id="signup-btn" class="btn btn-primary" style="width:100%;padding:12px" onclick="handleSignup()">Create account</button>
+      <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-500)">Already have an account? <a style="color:var(--green-600);cursor:pointer" onclick="showPage('login')">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PROFILE ========== -->
+<div id="page-profile" class="page">
+  <div class="page-content">
+    <h1 style="font-family:var(--font-display);font-size:28px;color:var(--gray-900);margin-bottom:24px">My Account</h1>
+    <div class="profile-layout">
+      <div class="profile-sidebar">
+        <div class="profile-avatar">👤</div>
+        <div class="profile-name">Sipho Mokoena</div>
+        <div class="profile-email">sipho@email.com</div>
+        <div style="margin-bottom:16px"><span class="badge badge-green">Verified buyer</span></div>
+        <div class="profile-menu">
+          <div class="profile-menu-item active">📦 My Orders</div>
+          <div class="profile-menu-item">❤️ Saved items</div>
+          <div class="profile-menu-item">📍 Addresses</div>
+          <div class="profile-menu-item">⚙️ Settings</div>
+          <div class="profile-menu-item" style="color:var(--red-500)" onclick="handleSignOut()">↪ Sign out</div>
+        </div>
+      </div>
+      <div>
+        <div class="section-card" style="margin-bottom:16px">
+          <div class="section-card-title">My Orders</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--gray-50);border-radius:var(--radius-sm)">
+              <div><div style="font-weight:600;font-size:14px;color:var(--gray-900)">#1043 — Tomatoes, Eggs</div><div style="font-size:12px;color:var(--gray-500);margin-top:2px">Green Valley Farm · Today</div><div style="font-size:13px;color:var(--green-700);margin-top:4px;font-weight:500">R209.00 total</div></div>
+              <span class="badge badge-blue">In progress</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--gray-50);border-radius:var(--radius-sm)">
+              <div><div style="font-weight:600;font-size:14px;color:var(--gray-900)">#1038 — Spinach, Honey</div><div style="font-size:12px;color:var(--gray-500);margin-top:2px">Sunrise Organics · Last week</div><div style="font-size:13px;color:var(--green-700);margin-top:4px;font-weight:500">R180.00 total</div></div>
+              <span class="badge badge-green">Delivered</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--gray-50);border-radius:var(--radius-sm)">
+              <div><div style="font-weight:600;font-size:14px;color:var(--gray-900)">#1032 — Avocados, Basil</div><div style="font-size:12px;color:var(--gray-500);margin-top:2px">Avo Grove · 2 weeks ago</div><div style="font-size:13px;color:var(--green-700);margin-top:4px;font-weight:500">R140.00 total</div></div>
+              <span class="badge badge-green">Delivered</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ADD LISTING MODAL ========== -->
+<div id="add-listing-modal" class="modal-overlay hidden" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">Add new listing</div>
+    <div style="background:var(--green-50);border:1.5px dashed var(--green-300,#86efac);border-radius:var(--radius);height:100px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;cursor:pointer;flex-direction:column;gap:6px">
+      <div style="font-size:28px">📷</div>
+      <div style="font-size:12px;color:var(--green-700)">Upload produce photo</div>
+    </div>
+    <div class="form-group"><label class="label">Produce name</label><input class="input" type="text" placeholder="e.g. Roma Tomatoes" id="new-name" /></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label class="label">Category</label>
+        <select class="input" id="new-category"><option>Vegetables</option><option>Fruits</option><option>Dairy</option><option>Grains</option><option>Herbs</option></select>
+      </div>
+      <div class="form-group"><label class="label">Emoji icon</label><input class="input" type="text" placeholder="🍅" id="new-emoji" /></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label class="label">Price (R)</label><input class="input" type="number" placeholder="22" id="new-price" /></div>
+      <div class="form-group"><label class="label">Unit</label><input class="input" type="text" placeholder="kg" id="new-unit" /></div>
+    </div>
+    <div class="form-group"><label class="label">Stock quantity</label><input class="input" type="number" placeholder="50" id="new-stock" /></div>
+    <div style="background:var(--green-50);border-radius:var(--radius-sm);padding:10px;font-size:12px;color:var(--green-700);margin-bottom:14px">💡 You earn 92% of your listed price after our 8% platform commission.</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1" onclick="addListing()">Publish listing</button>
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
