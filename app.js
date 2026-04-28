@@ -15,12 +15,12 @@ const products = [
 ];
 
 const farmers = [
-  {name:'Thabo Nkosi',farm:'Green Valley Farm',location:'Mpumalanga',emoji:'👨🏿‍🌾',tags:['Vegetables','Organic'],products:12,rating:4.9,since:2019},
-  {name:'Amara Dlamini',farm:'Sunrise Organics',location:'KwaZulu-Natal',emoji:'👩🏾‍🌾',tags:['Vegetables','Herbs','Organic'],products:8,rating:4.8,since:2021},
-  {name:'Pieter van Wyk',farm:'Happy Hen Farm',location:'Western Cape',emoji:'👨🏻‍🌾',tags:['Poultry','Eggs'],products:5,rating:5.0,since:2018},
-  {name:'Nomsa Khumalo',farm:'Berry Bliss Farm',location:'Limpopo',emoji:'👩🏿‍🌾',tags:['Fruits','Berries'],products:6,rating:4.7,since:2020},
-  {name:'Rajesh Pillay',farm:'Golden Hive',location:'Gauteng',emoji:'👨🏽‍🌾',tags:['Honey','Beeswax'],products:3,rating:4.9,since:2017},
-  {name:'Maria Ferreira',farm:'Meadow Dairy',location:'Free State',emoji:'👩🏼‍🌾',tags:['Dairy','Organic'],products:7,rating:4.8,since:2016},
+  {name:'Thabo Nkosi',farm:'Green Valley Farm',location:'Vanderbijlpark, Vaal',emoji:'👨🏿‍🌾',tags:['Vegetables','Organic'],products:12,rating:4.9,since:2019},
+  {name:'Amara Dlamini',farm:'Sunrise Organics',location:'Vereeniging, Vaal',emoji:'👩🏾‍🌾',tags:['Vegetables','Herbs','Organic'],products:8,rating:4.8,since:2021},
+  {name:'Pieter van Wyk',farm:'Happy Hen Farm',location:'Meyerton, Vaal',emoji:'👨🏻‍🌾',tags:['Poultry','Eggs'],products:5,rating:5.0,since:2018},
+  {name:'Nomsa Khumalo',farm:'Berry Bliss Farm',location:'Three Rivers, Vaal',emoji:'👩🏿‍🌾',tags:['Fruits','Berries'],products:6,rating:4.7,since:2020},
+  {name:'Rajesh Pillay',farm:'Golden Hive',location:'Sebokeng, Vaal',emoji:'👨🏽‍🌾',tags:['Honey','Beeswax'],products:3,rating:4.9,since:2017},
+  {name:'Maria Ferreira',farm:'Meadow Dairy',location:'Sasolburg, Vaal',emoji:'👩🏼‍🌾',tags:['Dairy','Organic'],products:7,rating:4.8,since:2016},
 ];
 
 const farmerListings = [
@@ -49,6 +49,10 @@ function showPage(name) {
   if (name === 'checkout') renderCheckout();
   if (name === 'dashboard') renderDashboard();
   if (name === 'profile') renderProfilePage();
+  // Init Google Maps for relevant pages
+  if (typeof initMaps === 'function') {
+    setTimeout(() => initMaps(name), 100);
+  }
 }
 
 // PRODUCTS
