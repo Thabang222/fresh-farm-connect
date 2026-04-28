@@ -48,6 +48,7 @@ function showPage(name) {
   if (name === 'cart') renderCart();
   if (name === 'checkout') renderCheckout();
   if (name === 'dashboard') renderDashboard();
+  if (name === 'profile') renderProfilePage();
 }
 
 // PRODUCTS
@@ -294,3 +295,148 @@ function showToast(msg, type='') {
   renderFarmers();
   renderDashboard();
 })();
+
+
+// ============================================================
+//  PROFILE PAGE
+// ============================================================
+
+function switchProfileTab(tab) {
+  // Update menu items
+  document.querySelectorAll('.profile-menu-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab)?.classList.add('active');
+  // Show/hide panels
+  ['orders','addresses','settings'].forEach(t => {
+    const el = document.getElementById('profile-tab-' + t);
+    if (el) el.classList.toggle('hidden', t !== tab);
+  });
+}
+
+async function renderProfilePage() {
+  if (!currentUser) { showPage('login'); return; }
+
+  // Fill sidebar with real data
+  document.getElementById('profile-display-name').textContent = currentProfile?.name || currentUser.email;
+  document.getElementById('profile-display-email').textContent = currentProfile?.email || currentUser.email;
+  document.getElementById('profile-avatar-icon').textContent = currentRole === 'farmer' ? '👨🏿‍🌾' : '👤';
+  document.getElementById('profile-role-badge').textContent = currentRole === 'farmer' ? 'Farmer' : 'Verified buyer';
+
+  // Pre-fill settings tab
+  document.getElementById('settings-name').value = currentProfile?.name || '';
+  document.getElementById('settings-email').value = currentProfile?.email || currentUser.email;
+  document.getElementById('settings-phone').value = currentProfile?.phone || '';
+  document.getElementById('settings-address').value = currentProfile?.delivery_address || '';
+  document.getElementById('settings-province').value = currentProfile?.province || '';
+
+  // Farmer extra fields
+  const farmerFields = document.getElementById('farmer-settings-fields');
+  if (currentRole === 'farmer') {
+    farmerFields.classList.remove('hidden');
+    document.getElementById('settings-farm-name').value = currentProfile?.farm_name || '';
+    document.getElementById('settings-location').value = currentProfile?.location || '';
+    document.getElementById('settings-what-they-grow').value = currentProfile?.what_they_grow || '';
+  } else {
+    farmerFields.classList.add('hidden');
+  }
+
+  // Load real orders
+  await loadProfileOrders();
+
+  // Default to orders tab
+  switchProfileTab('orders');
+}
+
+async function loadProfileOrders() {
+  const list = document.getElementById('orders-list');
+  const badge = document.getElementById('orders-count-badge');
+  if (!list) return;
+
+  list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400)">Loading orders…</div>';
+
+  const { data: orders, error } = await db
+    .from('orders')
+    .select('*')
+    .eq('buyer_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (error || !orders || orders.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:40px">
+      <div style="font-size:36px;margin-bottom:12px">📦</div>
+      <div style="font-size:15px;font-weight:600;color:var(--gray-900);margin-bottom:6px">No orders yet</div>
+      <div style="font-size:13px;color:var(--gray-500);margin-bottom:16px">Your orders will appear here once you place one.</div>
+      <button class="btn btn-primary" onclick="showPage('marketplace')">Start shopping</button>
+    </div>`;
+    return;
+  }
+
+  // Show count badge
+  badge.textContent = orders.length;
+  badge.style.display = '';
+
+  const statusColors = { pending: 'badge-blue', confirmed: 'badge-blue', delivered: 'badge-green', cancelled: 'badge-red' };
+  const statusLabels = { pending: 'Pending', confirmed: 'In progress', delivered: 'Delivered', cancelled: 'Cancelled' };
+
+  list.innerHTML = orders.map(o => {
+    const itemNames = (o.items || []).map(i => i.name).slice(0,3).join(', ');
+    const date = new Date(o.created_at).toLocaleDateString('en-ZA', { day:'numeric', month:'short', year:'numeric' });
+    const shortId = String(o.id).slice(0,8).toUpperCase();
+    const statusClass = statusColors[o.status] || 'badge-blue';
+    const statusLabel = statusLabels[o.status] || o.status;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--gray-50);border-radius:var(--radius-sm);margin-bottom:10px">
+      <div>
+        <div style="font-weight:600;font-size:14px;color:var(--gray-900)">#${shortId} — ${itemNames}</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:2px">${date}</div>
+        <div style="font-size:13px;color:var(--green-700);margin-top:4px;font-weight:500">R${Number(o.total).toFixed(2)} total</div>
+      </div>
+      <span class="badge ${statusClass}">${statusLabel}</span>
+    </div>`;
+  }).join('');
+}
+
+async function saveAddressSettings() {
+  if (!currentUser) return;
+  const address  = document.getElementById('settings-address')?.value?.trim();
+  const province = document.getElementById('settings-province')?.value;
+  const phone    = document.getElementById('settings-phone')?.value?.trim();
+
+  const table = currentRole === 'farmer' ? 'farmers' : 'buyers';
+  const { error } = await db.from(table).update({ delivery_address: address, province, phone }).eq('id', currentUser.id);
+
+  if (error) { showToast('Failed to save: ' + error.message, 'error'); return; }
+  if (currentProfile) { currentProfile.delivery_address = address; currentProfile.province = province; currentProfile.phone = phone; }
+  showToast('Address saved! ✅', 'success');
+}
+
+async function saveAccountSettings() {
+  if (!currentUser) return;
+  const name = document.getElementById('settings-name')?.value?.trim();
+  if (!name) { showToast('Name cannot be empty', 'error'); return; }
+
+  const updates = { name };
+  if (currentRole === 'farmer') {
+    updates.farm_name      = document.getElementById('settings-farm-name')?.value?.trim();
+    updates.location       = document.getElementById('settings-location')?.value?.trim();
+    updates.what_they_grow = document.getElementById('settings-what-they-grow')?.value?.trim();
+  }
+
+  const table = currentRole === 'farmer' ? 'farmers' : 'buyers';
+  const { error } = await db.from(table).update(updates).eq('id', currentUser.id);
+
+  if (error) { showToast('Failed to save: ' + error.message, 'error'); return; }
+  if (currentProfile) Object.assign(currentProfile, updates);
+
+  // Update nav name instantly
+  const label = document.getElementById('nav-user-label');
+  if (label) label.textContent = name.split(' ')[0];
+  document.getElementById('profile-display-name').textContent = name;
+
+  showToast('Account updated! ✅', 'success');
+}
+
+async function sendPasswordReset() {
+  const email = currentUser?.email;
+  if (!email) return;
+  const { error } = await db.auth.resetPasswordForEmail(email);
+  if (error) { showToast(error.message, 'error'); return; }
+  showToast('Password reset email sent to ' + email, 'success');
+}
