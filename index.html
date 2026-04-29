@@ -72,7 +72,13 @@
         </div>
         <div>
           <div class="hero-visual">
-            <div id="hero-map" style="width:100%;height:200px;border-radius:var(--radius);overflow:hidden;"></div>
+            <div class="hero-map-mock">
+              <div style="font-size:36px;margin-bottom:8px">🗺️</div>
+              <div style="font-size:13px;color:var(--gray-500)">Farms near Johannesburg</div>
+              <div class="map-pin" style="top:40%;left:45%"></div>
+              <div class="map-pin" style="top:60%;left:60%"></div>
+              <div class="map-pin" style="top:30%;left:70%"></div>
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
               <div style="background:var(--green-50);border-radius:var(--radius-sm);padding:12px">
                 <div style="font-size:22px;margin-bottom:4px">🍅</div>
@@ -172,11 +178,20 @@
     <div class="map-section">
       <div class="section-card" style="padding:16px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="font-weight:600;font-size:14px;color:var(--gray-800)">🗺️ Farms near you — Vaal Region</div>
-          <span class="badge badge-green">Vanderbijlpark · Vereeniging · Sasolburg</span>
+          <div style="font-weight:600;font-size:14px;color:var(--gray-800)">🗺️ Farms near you — Johannesburg</div>
+          <span class="badge badge-green">Google Maps API required for live map</span>
         </div>
         <div class="map-container">
-          <div id="marketplace-map" style="width:100%;height:100%;">
+          <div style="width:100%;height:100%;background:linear-gradient(135deg,#e8f5e9 0%,#c8e6c9 50%,#a5d6a7 100%);position:relative;overflow:hidden">
+            <!-- Simulated map grid -->
+            <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.15" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <line x1="25" y1="0" x2="25" y2="100" stroke="#388e3c" stroke-width="0.5"/>
+              <line x1="50" y1="0" x2="50" y2="100" stroke="#388e3c" stroke-width="0.5"/>
+              <line x1="75" y1="0" x2="75" y2="100" stroke="#388e3c" stroke-width="0.5"/>
+              <line x1="0" y1="33" x2="100" y2="33" stroke="#388e3c" stroke-width="0.5"/>
+              <line x1="0" y1="66" x2="100" y2="66" stroke="#388e3c" stroke-width="0.5"/>
+            </svg>
+            <!-- Demo pins -->
             <div class="demo-pin" style="top:35%;left:40%">
               <div class="demo-pin-label">Green Valley Farm</div>
               <div class="demo-pin-dot"></div>
@@ -272,47 +287,56 @@
     <h1 style="font-family:var(--font-display);font-size:28px;color:var(--gray-900);margin-bottom:24px">Checkout</h1>
     <div class="checkout-layout">
       <div>
-        <!-- Delivery Address -->
+
+        <!-- STEP 1: Delivery Address -->
         <div class="card" style="padding:20px;margin-bottom:16px">
-          <div style="font-weight:600;font-size:15px;margin-bottom:16px;color:var(--gray-900)">📍 Delivery Address — Vaal Region</div>
-          <!-- Google Maps pin drop -->
-          <div class="form-group">
-            <label class="label">Search your address</label>
-            <input class="input" id="delivery-address-input" type="text" placeholder="e.g. 12 Frikkie Meyer Blvd, Vanderbijlpark" />
+          <div style="font-weight:600;font-size:16px;margin-bottom:4px;color:var(--gray-900)">📍 Step 1 — Delivery Address</div>
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:14px">Search your address or click on the map to drop a pin. It saves automatically.</div>
+
+          <!-- Address search -->
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <input id="delivery-address-input" class="input" type="text" placeholder="e.g. 12 Frikkie Meyer Blvd, Vanderbijlpark" style="flex:1" />
+            <button id="delivery-search-btn" class="btn btn-primary" style="padding:10px 16px;white-space:nowrap" onclick="searchDeliveryAddress(document.getElementById('delivery-address-input').value)">Search</button>
           </div>
-          <div id="checkout-map" style="width:100%;height:220px;border-radius:var(--radius);margin-bottom:12px;border:1.5px dashed var(--green-300,#86efac);overflow:hidden;background:#e8f5e9;display:flex;align-items:center;justify-content:center">
-            <div style="text-align:center">
-              <div style="font-size:28px">🗺️</div>
-              <div style="font-size:12px;color:var(--gray-500);margin-top:6px">Click on map to drop delivery pin</div>
-            </div>
+
+          <!-- Leaflet map -->
+          <div id="checkout-map" style="height:300px;border-radius:var(--radius-sm);overflow:hidden;margin-bottom:12px;border:1px solid var(--gray-200)"></div>
+
+          <!-- Confirmed address display -->
+          <div id="delivery-address-display" style="font-size:13px;color:var(--gray-600);min-height:18px;margin-bottom:14px;padding:10px 12px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-200)">📍 Click the map or search to set your delivery location</div>
+
+          <!-- Phone number -->
+          <div class="form-group" style="margin-top:4px">
+            <label class="label">Phone number for delivery</label>
+            <input id="checkout-phone" class="input" type="tel" placeholder="082 000 0000" />
           </div>
-          <div id="delivery-address-display" style="font-size:12px;color:var(--green-700);margin-bottom:10px;min-height:16px"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="form-group"><label class="label">City</label><input class="input" type="text" placeholder="Vanderbijlpark" /></div>
-            <div class="form-group"><label class="label">Province</label><input class="input" type="text" value="Gauteng" /></div>
-          </div>
-          <div class="form-group"><label class="label">Phone number</label><input class="input" type="tel" placeholder="082 000 0000" /></div>
         </div>
 
-        <!-- Payment -->
+        <!-- STEP 2: Payment Method -->
         <div class="card" style="padding:20px;margin-bottom:16px">
-          <div style="font-weight:600;font-size:15px;margin-bottom:16px;color:var(--gray-900)">💳 Payment Method</div>
+          <div style="font-weight:600;font-size:16px;margin-bottom:4px;color:var(--gray-900)">💳 Step 2 — Payment Method</div>
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:14px">Secure payment powered by PayFast</div>
+
+        <div class="card" style="padding:0;margin-bottom:0;border:none">
           <div class="payment-methods">
-            <div class="payment-method active" onclick="selectPayment(this)">💳 Card</div>
-            <div class="payment-method" onclick="selectPayment(this)">🏦 EFT</div>
-            <div class="payment-method" onclick="selectPayment(this)">📱 SnapScan</div>
+            <div class="payment-method active" data-method="card" onclick="selectPayment(this)">💳 Card</div>
+            <div class="payment-method" data-method="eft" onclick="selectPayment(this)">🏦 EFT</div>
+            <div class="payment-method" data-method="snapscan" onclick="selectPayment(this)">📱 SnapScan</div>
           </div>
-          <div class="form-group"><label class="label">Card number</label><input class="input" type="text" placeholder="4242 4242 4242 4242" /></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="form-group"><label class="label">Expiry</label><input class="input" type="text" placeholder="MM/YY" /></div>
-            <div class="form-group"><label class="label">CVV</label><input class="input" type="text" placeholder="123" /></div>
+          <div id="card-fields" style="margin-top:14px">
+            <div class="form-group"><label class="label">Card number</label><input id="checkout-card" class="input" type="text" placeholder="4242 4242 4242 4242" maxlength="19" /></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="form-group"><label class="label">Expiry</label><input class="input" type="text" placeholder="MM/YY" maxlength="5" /></div>
+              <div class="form-group"><label class="label">CVV</label><input class="input" type="text" placeholder="123" maxlength="3" /></div>
+            </div>
           </div>
           <div style="background:var(--green-50);border-radius:var(--radius-sm);padding:10px;font-size:12px;color:var(--green-700);margin-top:8px">🔒 Secured by PayFast. Your payment details are encrypted and never stored.</div>
         </div>
       </div>
 
+      <!-- Order Summary -->
       <div>
-        <div class="order-summary">
+        <div class="order-summary" style="position:sticky;top:80px">
           <div class="summary-title">Order Summary</div>
           <div id="checkout-items" style="margin-bottom:12px;font-size:13px;color:var(--gray-600)"></div>
           <hr class="divider" />
@@ -320,7 +344,7 @@
           <div class="summary-row commission-row"><span>Commission (8%)</span><span id="co-commission">R0</span></div>
           <div class="summary-row"><span>Delivery fee</span><span>R45</span></div>
           <div class="summary-row total"><span>Total</span><span id="co-total">R0</span></div>
-          <button class="btn btn-primary" style="width:100%;margin-top:16px;padding:12px" onclick="placeOrder()">Pay via PayFast →</button>
+          <button id="pay-btn" class="btn btn-primary" style="width:100%;margin-top:16px;padding:14px;font-size:15px" onclick="placeOrder()">Pay via PayFast →</button>
           <div class="summary-note" style="margin-top:10px">By placing your order you agree to our terms. Farmers receive 92% of the sale price after our 8% platform commission.</div>
         </div>
       </div>
@@ -336,18 +360,24 @@
       <h1 style="font-family:var(--font-display);font-size:26px;color:var(--green-700);margin-bottom:8px">Order Confirmed!</h1>
       <p style="color:var(--gray-500);margin-bottom:20px">Your fresh produce is being prepared by the farmer</p>
       <div style="background:var(--green-50);border-radius:var(--radius);padding:16px;margin-bottom:20px">
-        <div style="font-size:22px;font-weight:700;color:var(--green-800);font-family:var(--font-display)">Order #1044</div>
+        <div id="confirm-order-id" style="font-size:22px;font-weight:700;color:var(--green-800);font-family:var(--font-display)">Order #—</div>
+        <div id="confirm-order-items" style="font-size:13px;color:var(--green-700);margin-top:4px"></div>
+        <div id="confirm-order-total" style="font-size:14px;font-weight:600;color:var(--green-800);margin-top:6px"></div>
         <div style="font-size:13px;color:var(--green-600);margin-top:4px">Estimated delivery: 2–4 hours</div>
       </div>
 
       <div class="tracking-steps" style="text-align:left">
         <div class="tracking-step">
           <div class="step-indicator"><div class="step-dot done"></div><div class="step-line done"></div></div>
-          <div class="step-content"><div class="step-title">Order placed</div><div class="step-time">Just now</div></div>
+          <div class="step-content"><div class="step-title">Order placed</div><div class="step-time" id="confirm-time">Just now</div></div>
         </div>
         <div class="tracking-step">
           <div class="step-indicator"><div class="step-dot active"></div><div class="step-line"></div></div>
-          <div class="step-content"><div class="step-title">Farmer confirmed</div><div class="step-time">Awaiting confirmation</div></div>
+          <div class="step-content"><div class="step-title">Payment confirmed</div><div class="step-time">Processing via PayFast</div></div>
+        </div>
+        <div class="tracking-step">
+          <div class="step-indicator"><div class="step-dot pending"></div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Farmer preparing order</div><div class="step-time">Awaiting farmer</div></div>
         </div>
         <div class="tracking-step">
           <div class="step-indicator"><div class="step-dot pending"></div><div class="step-line"></div></div>
@@ -359,14 +389,14 @@
         </div>
       </div>
 
-      <div style="background:var(--gray-50);border-radius:var(--radius);padding:14px;margin-top:16px;text-align:left">
-        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Contact your farmer</div>
-        <div style="font-size:13px;color:var(--gray-500)">WhatsApp Thabo Nkosi: 082 000 0000</div>
+      <div id="confirm-address-block" style="background:var(--gray-50);border-radius:var(--radius);padding:14px;margin-top:16px;text-align:left;display:none">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">📍 Delivering to</div>
+        <div id="confirm-address" style="font-size:13px;color:var(--gray-500)"></div>
       </div>
 
       <div style="display:flex;gap:10px;margin-top:20px">
         <button class="btn btn-primary" style="flex:1" onclick="showPage('marketplace')">Continue Shopping</button>
-        <button class="btn btn-outline" style="flex:1" onclick="showPage('profile')">View Orders</button>
+        <button class="btn btn-outline" style="flex:1" onclick="showPage('profile')">View My Orders</button>
       </div>
     </div>
   </div>
@@ -627,7 +657,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
-<script src="maps.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
