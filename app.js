@@ -1,359 +1,566 @@
-// ============================================================
-//  SUPABASE CONFIG
-// ============================================================
-const SUPABASE_URL = 'https://rcgkndudoildwbzyvdko.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZ2tuZHVkb2lsZHdienl2ZGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMjkwODcsImV4cCI6MjA5MjkwNTA4N30.hkpEMQbSs0DOYbIfBTqZQzWhL0Wm8NN9eJf2WW93baA';
+// DATA
+const products = [
+  {id:'1',name:'Roma Tomatoes',price:22,unit:'kg',farmer:'Green Valley Farm',location:'Vaal Region',emoji:'🍅',image:'https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=400&q=80',stock:28,category:'Vegetables',organic:true},
+  {id:'2',name:'Baby Spinach',price:35,unit:'bag',farmer:'Sunrise Organics',location:'Vaal Region',emoji:'🥬',image:'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&q=80',stock:15,category:'Vegetables',organic:true},
+  {id:'3',name:'Free-range Eggs',price:85,unit:'dozen',farmer:'Happy Hen Farm',location:'Vaal Region',emoji:'🥚',image:'https://images.unsplash.com/photo-1518569656558-1f25e69d2049?w=400&q=80',stock:8,category:'Dairy',organic:false},
+  {id:'4',name:'Strawberries',price:55,unit:'punnet',farmer:'Berry Bliss Farm',location:'Vaal Region',emoji:'🍓',image:'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=400&q=80',stock:20,category:'Fruits',organic:true},
+  {id:'5',name:'Raw Honey',price:120,unit:'jar',farmer:'Golden Hive',location:'Vaal Region',emoji:'🍯',image:'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&q=80',stock:12,category:'Herbs',organic:true},
+  {id:'6',name:'Butternut Squash',price:18,unit:'each',farmer:'Green Valley Farm',location:'Vaal Region',emoji:'🎃',image:'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=400&q=80',stock:30,category:'Vegetables',organic:false},
+  {id:'7',name:'Avocados',price:12,unit:'each',farmer:'Avo Grove',location:'Vaal Region',emoji:'🥑',image:'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=400&q=80',stock:45,category:'Fruits',organic:true},
+  {id:'8',name:'Fresh Milk',price:25,unit:'litre',farmer:'Meadow Dairy',location:'Vaal Region',emoji:'🥛',image:'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&q=80',stock:20,category:'Dairy',organic:false},
+  {id:'9',name:'Sweet Corn',price:8,unit:'each',farmer:'Sunrise Organics',location:'Vaal Region',emoji:'🌽',image:'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400&q=80',stock:60,category:'Vegetables',organic:false},
+  {id:'10',name:'Fresh Basil',price:25,unit:'bunch',farmer:'Herb Haven',location:'Vaal Region',emoji:'🌿',image:'https://images.unsplash.com/photo-1618375531912-867984bdfd87?w=400&q=80',stock:10,category:'Herbs',organic:true},
+  {id:'11',name:'Wheat Flour',price:45,unit:'2kg bag',farmer:'Mill Stone Farm',location:'Vaal Region',emoji:'🌾',image:'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&q=80',stock:25,category:'Grains',organic:false},
+  {id:'12',name:'Peaches',price:40,unit:'kg',farmer:'Orchard Gold',location:'Vaal Region',emoji:'🍑',image:'https://images.unsplash.com/photo-1629828874514-f0771c8d5e91?w=400&q=80',stock:18,category:'Fruits',organic:false},
+];
 
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const farmers = [
+  {name:'Thabo Nkosi',farm:'Green Valley Farm',location:'Mpumalanga',emoji:'👨🏿‍🌾',tags:['Vegetables','Organic'],products:12,rating:4.9,since:2019},
+  {name:'Amara Dlamini',farm:'Sunrise Organics',location:'KwaZulu-Natal',emoji:'👩🏾‍🌾',tags:['Vegetables','Herbs','Organic'],products:8,rating:4.8,since:2021},
+  {name:'Pieter van Wyk',farm:'Happy Hen Farm',location:'Western Cape',emoji:'👨🏻‍🌾',tags:['Poultry','Eggs'],products:5,rating:5.0,since:2018},
+  {name:'Nomsa Khumalo',farm:'Berry Bliss Farm',location:'Limpopo',emoji:'👩🏿‍🌾',tags:['Fruits','Berries'],products:6,rating:4.7,since:2020},
+  {name:'Rajesh Pillay',farm:'Golden Hive',location:'Gauteng',emoji:'👨🏽‍🌾',tags:['Honey','Beeswax'],products:3,rating:4.9,since:2017},
+  {name:'Maria Ferreira',farm:'Meadow Dairy',location:'Free State',emoji:'👩🏼‍🌾',tags:['Dairy','Organic'],products:7,rating:4.8,since:2016},
+];
 
-// ============================================================
-//  AUTH STATE
-// ============================================================
-let currentUser = null;
-let currentProfile = null; // farmer or buyer row
-let currentRole = null;    // 'farmer' | 'buyer'
+const farmerListings = [
+  {emoji:'🍅',name:'Roma Tomatoes',stock:'28 kg in stock',price:'R22/kg',low:false},
+  {emoji:'🥬',name:'Baby Spinach',stock:'15 bags in stock',price:'R35/bag',low:false},
+  {emoji:'🥚',name:'Free-range Eggs',stock:'8 dozen remaining',price:'R85/doz',low:true},
+  {emoji:'🌿',name:'Fresh Basil',stock:'3 bunches left',price:'R25/bunch',low:true},
+];
 
-async function initAuth() {
-  const { data: { session } } = await db.auth.getSession();
-  if (session?.user) {
-    currentUser = session.user;
-    await resolveProfile(session.user);
-    updateNav();
+let cart = [];
+let activeFilter = 'All';
+const COMMISSION_RATE = 0.08;
+const DELIVERY_FEE = 45;
+
+// PAGES
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (page) page.classList.add('active');
+  window.scrollTo(0,0);
+  if (name === 'marketplace') renderProducts(products);
+  if (name === 'home') {
+    renderFeatured();
+    setTimeout(() => { if (typeof initMaps === 'function') initMaps('home'); }, 150);
   }
-
-  db.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session?.user) {
-      currentUser = session.user;
-      await handleOAuthRedirect();
-      await resolveProfile(session.user);
-      updateNav();
-      // If redirected back from Google, go to marketplace or intended page
-      if (window.location.hash.includes('access_token')) {
-        const redirect = window._redirectAfterLogin || 'marketplace';
-        window._redirectAfterLogin = null;
-        showPage(redirect);
-        showToast('Welcome! 👋', 'success');
-      } else if (window._redirectAfterLogin) {
-        const redirect = window._redirectAfterLogin;
-        window._redirectAfterLogin = null;
-        showPage(redirect);
-      }
-    } else if (event === 'SIGNED_OUT') {
-      currentUser = null;
-      currentProfile = null;
-      currentRole = null;
-      updateNav();
+  if (name === 'farmers') renderFarmers();
+  if (name === 'cart') renderCart();
+  if (name === 'checkout') {
+    if (typeof currentUser === 'undefined' || !currentUser) {
+      showToast('Please sign in to checkout 🔒', 'error');
+      // Store intent so we can redirect back after login
+      window._redirectAfterLogin = 'checkout';
+      showPage('login');
+      return;
     }
-  });
+    renderCheckout();
+  }
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'profile') renderProfilePage();
 }
 
-// Check farmers table first, then buyers
-async function resolveProfile(user) {
-  const { data: farmer } = await db
-    .from('farmers')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+// PRODUCTS
+function renderProductCard(p) {
+  const imgSrc = p.image || '';
+  const imgHtml = imgSrc
+    ? `<img src="${imgSrc}" alt="${p.name}" class="product-img" onerror="this.parentElement.innerHTML='<div class=product-img-placeholder>${p.emoji}</div>'" />`
+    : `<div class="product-img-placeholder">${p.emoji}</div>`;
+  return `<div class="product-card" onclick="addToCart('${p.id}')">
+    <div class="product-img-wrap">${imgHtml}</div>
+    ${p.organic ? '<div class="product-organic-badge">Organic</div>' : ''}
+    <div class="product-body">
+      <div class="product-cat">${p.category}</div>
+      <div class="product-name">${p.name}</div>
+      <div class="product-farmer">by ${p.farmer} · ${p.location}</div>
+      <div class="product-footer">
+        <div><span class="product-price">R${p.price}</span><span class="product-unit"> / ${p.unit}</span></div>
+        <button class="add-to-cart-btn" onclick="event.stopPropagation();addToCart('${p.id}')">+</button>
+      </div>
+      <div class="product-stock">${p.stock} ${p.unit}s available</div>
+    </div>
+  </div>`;
+}
 
-  if (farmer) {
-    currentProfile = farmer;
-    currentRole = 'farmer';
+function renderProducts(list) {
+  const grid = document.getElementById('products-grid');
+  const noResults = document.getElementById('no-results');
+  if (!grid) return;
+  grid.innerHTML = list.map(renderProductCard).join('');
+  if (list.length === 0) { noResults.classList.remove('hidden'); grid.classList.add('hidden'); }
+  else { noResults.classList.add('hidden'); grid.classList.remove('hidden'); }
+}
+
+function renderFeatured() {
+  const grid = document.getElementById('featured-grid');
+  if (!grid) return;
+  grid.innerHTML = products.slice(0,4).map(renderProductCard).join('');
+}
+
+function setFilter(f, el) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  filterProducts();
+}
+
+function filterProducts() {
+  const q = (document.getElementById('market-search')?.value || '').toLowerCase();
+  const filtered = products.filter(p =>
+    (activeFilter === 'All' || p.category === activeFilter) &&
+    (p.name.toLowerCase().includes(q) || p.farmer.toLowerCase().includes(q))
+  );
+  renderProducts(filtered);
+}
+
+// FARMERS
+function renderFarmers() {
+  const grid = document.getElementById('farmers-grid');
+  if (!grid) return;
+  grid.innerHTML = farmers.map(f => `
+    <div class="farmer-card">
+      <div class="farmer-top">
+        <div class="farmer-avatar">${f.emoji}</div>
+        <div><div class="farmer-name">${f.name}</div><div class="farmer-farm">${f.farm}</div></div>
+      </div>
+      <div class="farmer-location">📍 ${f.location}</div>
+      <div class="farmer-tags">${f.tags.map(t=>`<span class="farmer-tag">${t}</span>`).join('')}</div>
+      <div class="farmer-stats">
+        <div class="farmer-stat"><div class="farmer-stat-val">${f.products}</div><div class="farmer-stat-lbl">Products</div></div>
+        <div class="farmer-stat"><div class="farmer-stat-val star">★ ${f.rating}</div><div class="farmer-stat-lbl">Rating</div></div>
+        <div class="farmer-stat"><div class="farmer-stat-val">${f.since}</div><div class="farmer-stat-lbl">Since</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// CART
+function addToCart(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  const ex = cart.find(x => x.id === id);
+  if (ex) ex.qty++;
+  else cart.push({...p, qty:1});
+  updateCartBadge();
+  showToast(p.emoji + ' ' + p.name + ' added to cart', 'success');
+}
+
+function updateCartBadge() {
+  const total = cart.reduce((s,x) => s+x.qty, 0);
+  const badge = document.getElementById('cart-badge');
+  badge.textContent = total;
+  total > 0 ? badge.classList.remove('hidden') : badge.classList.add('hidden');
+}
+
+function renderCart() {
+  const empty = document.getElementById('cart-empty');
+  const content = document.getElementById('cart-content');
+  if (!empty || !content) return;
+  if (cart.length === 0) {
+    empty.classList.remove('hidden'); content.classList.add('hidden'); return;
+  }
+  empty.classList.add('hidden'); content.classList.remove('hidden');
+  const subtotal = cart.reduce((s,x) => s + x.price * x.qty, 0);
+  const commission = subtotal * COMMISSION_RATE;
+  const total = subtotal + commission + DELIVERY_FEE;
+  document.getElementById('cart-items-list').innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-img">${item.emoji}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-farmer">by ${item.farmer}</div>
+        <div class="cart-item-price">R${item.price} / ${item.unit}</div>
+      </div>
+      <div class="cart-item-actions">
+        <button class="remove-btn" onclick="removeFromCart('${item.id}')">🗑</button>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+        </div>
+        <div style="font-size:14px;font-weight:600;color:var(--green-700)">R${item.price * item.qty}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('sum-subtotal').textContent = 'R' + subtotal.toFixed(2);
+  document.getElementById('sum-commission').textContent = 'R' + commission.toFixed(2);
+  document.getElementById('sum-total').textContent = 'R' + total.toFixed(2);
+}
+
+function changeQty(id, delta) {
+  const item = cart.find(x => x.id === id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+  updateCartBadge();
+  renderCart();
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(x => x.id !== id);
+  updateCartBadge();
+  renderCart();
+  showToast('Item removed', 'success');
+}
+
+function renderCheckout() {
+  const subtotal = cart.reduce((s,x) => s + x.price * x.qty, 0);
+  const commission = subtotal * COMMISSION_RATE;
+  const total = subtotal + commission + DELIVERY_FEE;
+  const items = document.getElementById('checkout-items');
+  if (items) items.innerHTML = cart.map(i => `<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>${i.emoji} ${i.name} ×${i.qty}</span><span>R${i.price * i.qty}</span></div>`).join('');
+  const coSub = document.getElementById('co-subtotal');
+  const coCom = document.getElementById('co-commission');
+  const coTot = document.getElementById('co-total');
+  if (coSub) coSub.textContent = 'R' + subtotal.toFixed(2);
+  if (coCom) coCom.textContent = 'R' + commission.toFixed(2);
+  if (coTot) coTot.textContent = 'R' + total.toFixed(2);
+
+  // Hide payment step initially
+  const payStep = document.getElementById('payment-step');
+  if (payStep) payStep.style.display = 'none';
+
+  // Pre-fill from saved profile
+  if (currentProfile) {
+    const phoneEl = document.getElementById('checkout-phone');
+    const addrEl  = document.getElementById('delivery-address-input');
+    const display = document.getElementById('delivery-address-display');
+    if (phoneEl && currentProfile.phone)            phoneEl.value = currentProfile.phone;
+    if (addrEl  && currentProfile.delivery_address) addrEl.value  = currentProfile.delivery_address;
+    if (display && currentProfile.delivery_address) {
+      display.textContent = '📍 ' + currentProfile.delivery_address;
+      if (typeof selectedDelivery !== 'undefined') {
+        selectedDelivery = { address: currentProfile.delivery_address };
+      }
+    }
+  }
+
+  // Init Leaflet map
+  setTimeout(() => { if (typeof initMaps === 'function') initMaps('checkout'); }, 150);
+}
+
+function confirmDeliveryAndPay() {
+  const delivery = typeof getDeliveryDetails === 'function' ? getDeliveryDetails() : null;
+  const manualAddr = document.getElementById('delivery-address-input')?.value?.trim();
+  const finalAddress = delivery?.address || manualAddr || currentProfile?.delivery_address;
+
+  if (!finalAddress || finalAddress === 'Click the map or search to set your delivery location') {
+    showToast('Please set your delivery address on the map first 📍', 'error'); return;
+  }
+
+  const phone = document.getElementById('checkout-phone')?.value?.trim() || currentProfile?.phone;
+  if (!phone) {
+    showToast('Please enter your phone number for delivery 📞', 'error'); return;
+  }
+
+  // Show payment step
+  const payStep = document.getElementById('payment-step');
+  const label   = document.getElementById('confirmed-address-label');
+  if (payStep) { payStep.style.display = 'block'; payStep.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  if (label)   label.textContent = finalAddress;
+  showToast('Address confirmed! ✅ Now choose your payment method.', 'success');
+}
+
+async function placeOrder() {
+  if (typeof currentUser === 'undefined' || !currentUser) {
+    showToast('Please sign in to place your order 🔒', 'error');
+    window._redirectAfterLogin = 'checkout';
+    showPage('login');
     return;
   }
 
-  const { data: buyer } = await db
-    .from('buyers')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  // Validate address
+  const delivery = typeof getDeliveryDetails === 'function' ? getDeliveryDetails() : null;
+  const manualAddr = document.getElementById('delivery-address-input')?.value?.trim();
+  const finalAddress = delivery?.address || manualAddr || currentProfile?.delivery_address;
+  if (!finalAddress) {
+    showToast('Please set a delivery address on the map 📍', 'error'); return;
+  }
 
-  if (buyer) {
-    currentProfile = buyer;
-    currentRole = 'buyer';
+  // Validate phone
+  const phone = document.getElementById('checkout-phone')?.value?.trim() || currentProfile?.phone;
+  if (!phone) {
+    showToast('Please enter a phone number for delivery 📞', 'error'); return;
+  }
+
+  // Disable button to prevent double orders
+  const btn = document.getElementById('pay-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Processing…'; }
+
+  const order = await saveOrder(cart, finalAddress, phone);
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Pay via PayFast →'; }
+
+  // Show confirmation with real order details
+  const shortId = order?.id ? String(order.id).slice(0,8).toUpperCase() : Math.floor(Math.random()*9000+1000);
+  const confirmId = document.getElementById('confirm-order-id');
+  const confirmItems = document.getElementById('confirm-order-items');
+  const confirmTotal = document.getElementById('confirm-order-total');
+  const confirmTime  = document.getElementById('confirm-time');
+  if (confirmId)    confirmId.textContent    = 'Order #' + shortId;
+  if (confirmItems) confirmItems.textContent = cart.map(i => i.emoji + ' ' + i.name + ' ×' + i.qty).join(', ');
+  if (confirmTotal) confirmTotal.textContent = 'R' + cart.reduce((s,x) => s + x.price * x.qty, 0).toFixed(2) + ' + R45 delivery';
+  if (confirmTime)  confirmTime.textContent  = new Date().toLocaleTimeString('en-ZA', { hour:'2-digit', minute:'2-digit' });
+
+  cart = [];
+  updateCartBadge();
+  showPage('confirmation');
+  showToast('Order placed successfully! 🌿', 'success');
+}
+
+// DASHBOARD
+function renderDashboard() {
+  const list = document.getElementById('farmer-listings');
+  if (!list) return;
+  list.innerHTML = farmerListings.map(l => `
+    <div class="listing-item">
+      <div class="listing-emoji">${l.emoji}</div>
+      <div class="listing-info">
+        <div class="listing-name">${l.name}</div>
+        <div class="listing-stock" style="${l.low?'color:var(--amber-500)':''}">${l.low?'⚠️ ':''} ${l.stock}</div>
+      </div>
+      <div class="listing-price">${l.price}</div>
+      <div class="listing-actions">
+        <button class="icon-btn" title="Edit">✏️</button>
+        <button class="icon-btn btn-danger" title="Delete">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addListing() {
+  const name = document.getElementById('new-name')?.value;
+  const emoji = document.getElementById('new-emoji')?.value || '🌱';
+  const price = document.getElementById('new-price')?.value;
+  const unit = document.getElementById('new-unit')?.value || 'kg';
+  const stock = document.getElementById('new-stock')?.value;
+  const category = document.getElementById('new-category')?.value;
+  if (!name || !price) { showToast('Please fill in all required fields', 'error'); return; }
+
+  const saved = await saveFarmerListing({name, emoji, price: parseInt(price), unit, stock: parseInt(stock)||0, category});
+  if (!saved) return; // error already shown
+
+  farmerListings.unshift({emoji, name, stock:`${stock} ${unit} in stock`, price:`R${price}/${unit}`, low:false});
+  products.unshift({id: Date.now().toString(), name, price:parseInt(price), unit, farmer: currentProfile?.farm_name || 'Local Farm', location: currentProfile?.farm_location || 'South Africa', emoji, stock:parseInt(stock)||0, category, organic:false});
+  closeModal();
+  renderDashboard();
+  showToast(emoji + ' ' + name + ' listed successfully!', 'success');
+}
+
+// AUTH
+function toggleAuthRole(btn, role) {
+  document.querySelectorAll('.auth-toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const extra = document.getElementById('farmer-extra-fields');
+  if (extra) role === 'farmer' ? extra.classList.remove('hidden') : extra.classList.add('hidden');
+}
+
+// PAYMENT
+function selectPayment(el) {
+  document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// MODAL
+function showModal(id) {
+  document.getElementById(id)?.classList.remove('hidden');
+}
+function closeModal(e) {
+  if (!e || e.target.classList.contains('modal-overlay')) {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
   }
 }
 
-function updateNav() {
-  const signinBtn = document.getElementById('nav-signin-btn');
-  const userBtn   = document.getElementById('nav-user-btn');
-  const userLabel = document.getElementById('nav-user-label');
-  const dashTab   = document.getElementById('nav-dashboard-btn');
-
-  if (currentUser) {
-    signinBtn?.classList.add('hidden');
-    userBtn?.classList.remove('hidden');
-    if (userLabel) userLabel.textContent = currentProfile?.name?.split(' ')[0] || 'Account';
-    if (dashTab) dashTab.style.display = currentRole === 'farmer' ? '' : 'none';
-  } else {
-    signinBtn?.classList.remove('hidden');
-    userBtn?.classList.add('hidden');
-    if (dashTab) dashTab.style.display = 'none';
-  }
+// TOAST
+function showToast(msg, type='') {
+  const container = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  container.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
 }
 
+// INIT
+(async () => {
+  await initAuth();
+  // Try loading products from Supabase
+  const dbProducts = await loadProducts();
+  if (dbProducts && dbProducts.length > 0) {
+    products.length = 0;
+    dbProducts.forEach(p => products.push(p));
+  }
+  renderFeatured();
+  renderFarmers();
+  renderDashboard();
+})();
+
+
 // ============================================================
-//  SIGN UP
+//  PROFILE PAGE
 // ============================================================
-async function handleSignup() {
-  const name     = document.getElementById('signup-name')?.value?.trim();
-  const email    = document.getElementById('signup-email')?.value?.trim();
-  const phone    = document.getElementById('signup-phone')?.value?.trim();
-  const password = document.getElementById('signup-password')?.value;
-  const role     = document.querySelector('#page-signup .auth-toggle-btn.active')?.dataset.role || 'buyer';
 
-  const farmName     = document.getElementById('signup-farm-name')?.value?.trim();
-  const farmLocation = document.getElementById('signup-farm-location')?.value?.trim();
-  const farmProducts = document.getElementById('signup-farm-products')?.value?.trim();
-
-  if (!name || !email || !password) {
-    showToast('Please fill in all required fields', 'error'); return;
-  }
-  if (password.length < 8) {
-    showToast('Password must be at least 8 characters', 'error'); return;
-  }
-  if (role === 'farmer' && !farmName) {
-    showToast('Please enter your farm name', 'error'); return;
-  }
-
-  const btn = document.getElementById('signup-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Creating account…'; }
-
-  const { data, error } = await db.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        role,
-        name,
-        farm_name: farmName || null,
-      }
-    }
+function switchProfileTab(tab) {
+  // Update menu items
+  document.querySelectorAll('.profile-menu-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab)?.classList.add('active');
+  // Show/hide panels
+  ['orders','addresses','settings'].forEach(t => {
+    const el = document.getElementById('profile-tab-' + t);
+    if (el) el.classList.toggle('hidden', t !== tab);
   });
+}
 
-  if (btn) { btn.disabled = false; btn.textContent = 'Create account'; }
+async function renderProfilePage() {
+  if (!currentUser) { showPage('login'); return; }
 
-  if (error) { showToast(error.message, 'error'); return; }
+  // Fill sidebar with real data
+  document.getElementById('profile-display-name').textContent = currentProfile?.name || currentUser.email;
+  document.getElementById('profile-display-email').textContent = currentProfile?.email || currentUser.email;
+  document.getElementById('profile-avatar-icon').textContent = currentRole === 'farmer' ? '👨🏿‍🌾' : '👤';
+  document.getElementById('profile-role-badge').textContent = currentRole === 'farmer' ? 'Farmer' : 'Verified buyer';
 
-  const userId = data.user?.id;
-  if (!userId) { showToast('Signup failed, please try again', 'error'); return; }
+  // Pre-fill settings tab
+  document.getElementById('settings-name').value = currentProfile?.name || '';
+  document.getElementById('settings-email').value = currentProfile?.email || currentUser.email;
+  document.getElementById('settings-phone').value = currentProfile?.phone || '';
+  document.getElementById('settings-address').value = currentProfile?.delivery_address || '';
+  document.getElementById('settings-province').value = currentProfile?.province || '';
 
-  // Trigger already created the profile row — just update the extra fields
-  await new Promise(r => setTimeout(r, 800));
-
-  if (role === 'farmer') {
-    await db.from('farmers').update({
-      phone:          phone || null,
-      location:       farmLocation || null,
-      what_they_grow: farmProducts || null,
-    }).eq('id', userId);
+  // Farmer extra fields
+  const farmerFields = document.getElementById('farmer-settings-fields');
+  if (currentRole === 'farmer') {
+    farmerFields.classList.remove('hidden');
+    document.getElementById('settings-farm-name').value = currentProfile?.farm_name || '';
+    document.getElementById('settings-location').value = currentProfile?.location || '';
+    document.getElementById('settings-what-they-grow').value = currentProfile?.what_they_grow || '';
   } else {
-    if (phone) {
-      await db.from('buyers').update({ phone }).eq('id', userId);
-    }
+    farmerFields.classList.add('hidden');
   }
 
-  showToast('Welcome to Fresh Farm Connect! 🌿', 'success');
-  showPage('marketplace');
+  // Load real orders
+  await loadProfileOrders();
+
+  // Default to orders tab
+  switchProfileTab('orders');
 }
 
-// ============================================================
-//  SIGN IN
-// ============================================================
-async function handleLogin() {
-  const email    = document.getElementById('login-email')?.value?.trim();
-  const password = document.getElementById('login-password')?.value;
+async function loadProfileOrders() {
+  const list = document.getElementById('orders-list');
+  const badge = document.getElementById('orders-count-badge');
+  if (!list) return;
 
-  if (!email || !password) {
-    showToast('Please enter your email and password', 'error'); return;
+  list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400)">Loading orders…</div>';
+
+  const { data: orders, error } = await db
+    .from('orders')
+    .select('*')
+    .eq('buyer_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (error || !orders || orders.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:40px">
+      <div style="font-size:36px;margin-bottom:12px">📦</div>
+      <div style="font-size:15px;font-weight:600;color:var(--gray-900);margin-bottom:6px">No orders yet</div>
+      <div style="font-size:13px;color:var(--gray-500);margin-bottom:16px">Your orders will appear here once you place one.</div>
+      <button class="btn btn-primary" onclick="showPage('marketplace')">Start shopping</button>
+    </div>`;
+    return;
   }
 
-  const btn = document.getElementById('login-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
+  // Show count badge
+  badge.textContent = orders.length;
+  badge.style.display = '';
 
-  const { error } = await db.auth.signInWithPassword({ email, password });
+  const statusColors = { pending: 'badge-blue', confirmed: 'badge-blue', delivered: 'badge-green', cancelled: 'badge-red' };
+  const statusLabels = { pending: 'Pending', confirmed: 'In progress', delivered: 'Delivered', cancelled: 'Cancelled' };
 
-  if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }
-
-  if (error) { showToast(error.message, 'error'); return; }
-
-  showToast('Welcome back! 👋', 'success');
-  showPage('marketplace');
+  list.innerHTML = orders.map(o => {
+    const itemNames = (o.items || []).map(i => i.name).slice(0,3).join(', ');
+    const date = new Date(o.created_at).toLocaleDateString('en-ZA', { day:'numeric', month:'short', year:'numeric' });
+    const shortId = String(o.id).slice(0,8).toUpperCase();
+    const statusClass = statusColors[o.status] || 'badge-blue';
+    const statusLabel = statusLabels[o.status] || o.status;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--gray-50);border-radius:var(--radius-sm);margin-bottom:10px">
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:14px;color:var(--gray-900)">#${shortId} — ${itemNames}</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:2px">${date}</div>
+        <div style="font-size:13px;color:var(--green-700);margin-top:4px;font-weight:500">R${Number(o.total).toFixed(2)} total</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span class="badge ${statusClass}">${statusLabel}</span>
+        <button onclick="deleteOrder('${o.id}')" title="Delete order"
+          style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--gray-400);padding:4px;border-radius:4px;transition:color 0.15s"
+          onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--gray-400)'">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-// ============================================================
-//  SIGN OUT
-// ============================================================
-async function handleSignOut() {
-  // Show feedback instantly, sign out in background
-  currentUser = null;
-  currentProfile = null;
-  currentRole = null;
-  updateNav();
-  showToast('Signed out successfully', 'success');
-  showPage('home');
-  db.auth.signOut(); // fire and forget
+async function saveAddressSettings() {
+  if (!currentUser) return;
+  const address  = document.getElementById('settings-address')?.value?.trim();
+  const province = document.getElementById('settings-province')?.value;
+  const phone    = document.getElementById('settings-phone')?.value?.trim();
+
+  const table = currentRole === 'farmer' ? 'farmers' : 'buyers';
+  const { error } = await db.from(table).update({ delivery_address: address, province, phone }).eq('id', currentUser.id);
+
+  if (error) { showToast('Failed to save: ' + error.message, 'error'); return; }
+  if (currentProfile) { currentProfile.delivery_address = address; currentProfile.province = province; currentProfile.phone = phone; }
+  showToast('Address saved! ✅', 'success');
 }
 
-// ============================================================
-//  FORGOT PASSWORD
-// ============================================================
-async function handleForgotPassword() {
-  const email = document.getElementById('login-email')?.value?.trim();
-  if (!email) { showToast('Enter your email address first', 'error'); return; }
+async function saveAccountSettings() {
+  if (!currentUser) return;
+  const name = document.getElementById('settings-name')?.value?.trim();
+  if (!name) { showToast('Name cannot be empty', 'error'); return; }
+
+  const updates = { name };
+  if (currentRole === 'farmer') {
+    updates.farm_name      = document.getElementById('settings-farm-name')?.value?.trim();
+    updates.location       = document.getElementById('settings-location')?.value?.trim();
+    updates.what_they_grow = document.getElementById('settings-what-they-grow')?.value?.trim();
+  }
+
+  const table = currentRole === 'farmer' ? 'farmers' : 'buyers';
+  const { error } = await db.from(table).update(updates).eq('id', currentUser.id);
+
+  if (error) { showToast('Failed to save: ' + error.message, 'error'); return; }
+  if (currentProfile) Object.assign(currentProfile, updates);
+
+  // Update nav name instantly
+  const label = document.getElementById('nav-user-label');
+  if (label) label.textContent = name.split(' ')[0];
+  document.getElementById('profile-display-name').textContent = name;
+
+  showToast('Account updated! ✅', 'success');
+}
+
+async function sendPasswordReset() {
+  const email = currentUser?.email;
+  if (!email) return;
   const { error } = await db.auth.resetPasswordForEmail(email);
   if (error) { showToast(error.message, 'error'); return; }
-  showToast('Password reset email sent! Check your inbox.', 'success');
+  showToast('Password reset email sent to ' + email, 'success');
 }
 
-// ============================================================
-//  PRODUCTS — load from Supabase, fall back to static data
-// ============================================================
-async function loadProducts() {
-  const { data, error } = await db
-    .from('products')
-    .select('*, farmers(name, farm_name, location)')
-    .eq('active', true)
-    .order('created_at', { ascending: false });
+async function deleteOrder(orderId) {
+  if (!currentUser) return;
+  if (!confirm('Delete this order from your history?')) return;
 
-  if (error || !data || data.length === 0) return null;
-
-  return data.map(p => ({
-    id:       String(p.id),
-    name:     p.name,
-    price:    p.price,
-    unit:     p.unit,
-    farmer:   p.farmers?.farm_name || p.farmers?.name || 'Local Farm',
-    location: p.farmers?.location || 'South Africa',
-    emoji:    p.emoji || '🌱',
-    stock:    p.stock,
-    category: p.category,
-    organic:  p.organic,
-  }));
-}
-
-// ============================================================
-//  ORDERS — save on checkout
-// ============================================================
-async function saveOrder(cart, deliveryAddress = null, phone = null) {
-  if (!currentUser) return null;
-
-  const subtotal   = cart.reduce((s, x) => s + x.price * x.qty, 0);
-  const commission = subtotal * COMMISSION_RATE;
-  const total      = subtotal + commission + DELIVERY_FEE;
-
-  const { data: order, error } = await db.from('orders').insert({
-    buyer_id:         currentUser.id,
-    buyer_name:       currentProfile?.name || null,
-    buyer_email:      currentProfile?.email || currentUser.email,
-    buyer_phone:      phone || currentProfile?.phone || null,
-    delivery_address: deliveryAddress || currentProfile?.delivery_address || null,
-    items:            cart,
-    subtotal,
-    commission,
-    delivery_fee:     DELIVERY_FEE,
-    total,
-    status:           'pending',
-  }).select().single();
+  const { error } = await db
+    .from('orders')
+    .delete()
+    .eq('id', orderId)
+    .eq('buyer_id', currentUser.id); // safety: only delete own orders
 
   if (error) {
-    console.error('Order save error:', error.message);
-    return null;
+    showToast('Failed to delete order: ' + error.message, 'error');
+    return;
   }
 
-  // Update buyer profile phone/address if not already saved
-  if (currentProfile && (phone || deliveryAddress)) {
-    const updates = {};
-    if (phone && !currentProfile.phone) updates.phone = phone;
-    if (deliveryAddress && !currentProfile.delivery_address) updates.delivery_address = deliveryAddress;
-    if (Object.keys(updates).length > 0) {
-      await db.from('buyers').update(updates).eq('id', currentUser.id);
-      Object.assign(currentProfile, updates);
-    }
-  }
-
-  return order;
-}
-
-// ============================================================
-//  FARMER LISTINGS — load & manage own products
-// ============================================================
-async function loadFarmerListings() {
-  if (!currentUser || currentRole !== 'farmer') return null;
-
-  const { data, error } = await db
-    .from('products')
-    .select('*')
-    .eq('farmer_id', currentUser.id)
-    .order('created_at', { ascending: false });
-
-  if (error || !data) return null;
-  return data;
-}
-
-async function saveFarmerListing(listing) {
-  if (!currentUser) { showToast('Please sign in to add listings', 'error'); return false; }
-  if (currentRole !== 'farmer') { showToast('Only farmers can add listings', 'error'); return false; }
-
-  const { error } = await db.from('products').insert({
-    farmer_id: currentUser.id,
-    name:      listing.name,
-    price:     listing.price,
-    unit:      listing.unit,
-    stock:     listing.stock,
-    category:  listing.category,
-    emoji:     listing.emoji,
-    organic:   false,
-    active:    true,
-  });
-
-  if (error) { showToast('Failed to save listing: ' + error.message, 'error'); return false; }
-  return true;
-}
-
-async function deleteFarmerListing(id) {
-  if (!currentUser || currentRole !== 'farmer') return;
-  const { error } = await db
-    .from('products')
-    .delete()
-    .eq('id', id)
-    .eq('farmer_id', currentUser.id);
-  if (error) showToast('Delete failed: ' + error.message, 'error');
-  return !error;
-}
-
-// ============================================================
-//  GOOGLE SIGN IN
-// ============================================================
-async function handleGoogleSignIn() {
-  const { error } = await db.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: window.location.origin,
-    }
-  });
-  if (error) showToast(error.message, 'error');
-}
-
-// Handle Google redirect — create profile row if first time
-async function handleOAuthRedirect() {
-  const { data: { session } } = await db.auth.getSession();
-  if (!session?.user) return;
-
-  const user = session.user;
-
-  // Check if profile already exists
-  const { data: farmer } = await db.from('farmers').select('id').eq('id', user.id).single();
-  if (farmer) return; // already set up
-
-  const { data: buyer } = await db.from('buyers').select('id').eq('id', user.id).single();
-  if (buyer) return; // already set up
-
-  // First time Google user — create buyer profile by default
-  const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0];
-  await db.from('buyers').insert({
-    id:    user.id,
-    name:  name,
-    email: user.email,
-  });
+  showToast('Order removed from your history', 'success');
+  await loadProfileOrders(); // refresh the list
 }
