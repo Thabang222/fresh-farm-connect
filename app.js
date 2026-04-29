@@ -15,12 +15,12 @@ const products = [
 ];
 
 const farmers = [
-  {name:'Thabo Nkosi',farm:'Green Valley Farm',location:'Vanderbijlpark, Vaal',emoji:'👨🏿‍🌾',tags:['Vegetables','Organic'],products:12,rating:4.9,since:2019},
-  {name:'Amara Dlamini',farm:'Sunrise Organics',location:'Vereeniging, Vaal',emoji:'👩🏾‍🌾',tags:['Vegetables','Herbs','Organic'],products:8,rating:4.8,since:2021},
-  {name:'Pieter van Wyk',farm:'Happy Hen Farm',location:'Meyerton, Vaal',emoji:'👨🏻‍🌾',tags:['Poultry','Eggs'],products:5,rating:5.0,since:2018},
-  {name:'Nomsa Khumalo',farm:'Berry Bliss Farm',location:'Three Rivers, Vaal',emoji:'👩🏿‍🌾',tags:['Fruits','Berries'],products:6,rating:4.7,since:2020},
-  {name:'Rajesh Pillay',farm:'Golden Hive',location:'Sebokeng, Vaal',emoji:'👨🏽‍🌾',tags:['Honey','Beeswax'],products:3,rating:4.9,since:2017},
-  {name:'Maria Ferreira',farm:'Meadow Dairy',location:'Sasolburg, Vaal',emoji:'👩🏼‍🌾',tags:['Dairy','Organic'],products:7,rating:4.8,since:2016},
+  {name:'Thabo Nkosi',farm:'Green Valley Farm',location:'Mpumalanga',emoji:'👨🏿‍🌾',tags:['Vegetables','Organic'],products:12,rating:4.9,since:2019},
+  {name:'Amara Dlamini',farm:'Sunrise Organics',location:'KwaZulu-Natal',emoji:'👩🏾‍🌾',tags:['Vegetables','Herbs','Organic'],products:8,rating:4.8,since:2021},
+  {name:'Pieter van Wyk',farm:'Happy Hen Farm',location:'Western Cape',emoji:'👨🏻‍🌾',tags:['Poultry','Eggs'],products:5,rating:5.0,since:2018},
+  {name:'Nomsa Khumalo',farm:'Berry Bliss Farm',location:'Limpopo',emoji:'👩🏿‍🌾',tags:['Fruits','Berries'],products:6,rating:4.7,since:2020},
+  {name:'Rajesh Pillay',farm:'Golden Hive',location:'Gauteng',emoji:'👨🏽‍🌾',tags:['Honey','Beeswax'],products:3,rating:4.9,since:2017},
+  {name:'Maria Ferreira',farm:'Meadow Dairy',location:'Free State',emoji:'👩🏼‍🌾',tags:['Dairy','Organic'],products:7,rating:4.8,since:2016},
 ];
 
 const farmerListings = [
@@ -46,13 +46,18 @@ function showPage(name) {
   if (name === 'home') renderFeatured();
   if (name === 'farmers') renderFarmers();
   if (name === 'cart') renderCart();
-  if (name === 'checkout') renderCheckout();
+  if (name === 'checkout') {
+    if (typeof currentUser === 'undefined' || !currentUser) {
+      showToast('Please sign in to checkout 🔒', 'error');
+      // Store intent so we can redirect back after login
+      window._redirectAfterLogin = 'checkout';
+      showPage('login');
+      return;
+    }
+    renderCheckout();
+  }
   if (name === 'dashboard') renderDashboard();
   if (name === 'profile') renderProfilePage();
-  // Init Google Maps for relevant pages
-  if (typeof initMaps === 'function') {
-    setTimeout(() => initMaps(name), 100);
-  }
 }
 
 // PRODUCTS
@@ -203,14 +208,72 @@ function renderCheckout() {
   if (coSub) coSub.textContent = 'R' + subtotal.toFixed(2);
   if (coCom) coCom.textContent = 'R' + commission.toFixed(2);
   if (coTot) coTot.textContent = 'R' + total.toFixed(2);
+
+  // Pre-fill delivery details from saved profile
+  if (currentProfile) {
+    const phoneEl = document.getElementById('checkout-phone');
+    const addrEl  = document.getElementById('delivery-address-input');
+    const display = document.getElementById('delivery-address-display');
+    if (phoneEl && currentProfile.phone)            phoneEl.value = currentProfile.phone;
+    if (addrEl  && currentProfile.delivery_address) addrEl.value  = currentProfile.delivery_address;
+    if (display && currentProfile.delivery_address) {
+      display.textContent = '📍 ' + currentProfile.delivery_address;
+      // Pre-set selectedDelivery so order saves correctly
+      if (typeof selectedDelivery !== 'undefined') {
+        selectedDelivery = { address: currentProfile.delivery_address };
+      }
+    }
+  }
+
+  // Init map after short delay so container is visible
+  setTimeout(() => { if (typeof initMaps === 'function') initMaps('checkout'); }, 100);
 }
 
 async function placeOrder() {
-  await saveOrder(cart);
+  if (typeof currentUser === 'undefined' || !currentUser) {
+    showToast('Please sign in to place your order 🔒', 'error');
+    window._redirectAfterLogin = 'checkout';
+    showPage('login');
+    return;
+  }
+
+  // Validate address
+  const delivery = typeof getDeliveryDetails === 'function' ? getDeliveryDetails() : null;
+  const manualAddr = document.getElementById('delivery-address-input')?.value?.trim();
+  const finalAddress = delivery?.address || manualAddr || currentProfile?.delivery_address;
+  if (!finalAddress) {
+    showToast('Please set a delivery address on the map 📍', 'error'); return;
+  }
+
+  // Validate phone
+  const phone = document.getElementById('checkout-phone')?.value?.trim() || currentProfile?.phone;
+  if (!phone) {
+    showToast('Please enter a phone number for delivery 📞', 'error'); return;
+  }
+
+  // Disable button to prevent double orders
+  const btn = document.getElementById('pay-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Processing…'; }
+
+  const order = await saveOrder(cart, finalAddress, phone);
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Pay via PayFast →'; }
+
+  // Show confirmation with real order details
+  const shortId = order?.id ? String(order.id).slice(0,8).toUpperCase() : Math.floor(Math.random()*9000+1000);
+  const confirmId = document.getElementById('confirm-order-id');
+  const confirmItems = document.getElementById('confirm-order-items');
+  const confirmTotal = document.getElementById('confirm-order-total');
+  const confirmTime  = document.getElementById('confirm-time');
+  if (confirmId)    confirmId.textContent    = 'Order #' + shortId;
+  if (confirmItems) confirmItems.textContent = cart.map(i => i.emoji + ' ' + i.name + ' ×' + i.qty).join(', ');
+  if (confirmTotal) confirmTotal.textContent = 'R' + cart.reduce((s,x) => s + x.price * x.qty, 0).toFixed(2) + ' + R45 delivery';
+  if (confirmTime)  confirmTime.textContent  = new Date().toLocaleTimeString('en-ZA', { hour:'2-digit', minute:'2-digit' });
+
   cart = [];
   updateCartBadge();
   showPage('confirmation');
-  showToast('Order placed successfully!', 'success');
+  showToast('Order placed successfully! 🌿', 'success');
 }
 
 // DASHBOARD
