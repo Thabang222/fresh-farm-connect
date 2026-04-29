@@ -1,6 +1,13 @@
 [build]
   publish = "."
 
+# Allow admin.html to be accessed directly
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+# SPA fallback for main app only
 [[redirects]]
   from = "/*"
   to = "/index.html"
