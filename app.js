@@ -1,17 +1,17 @@
 // DATA
 const products = [
-  {id:'1',name:'Roma Tomatoes',price:22,unit:'kg',farmer:'Green Valley Farm',location:'Mpumalanga',emoji:'🍅',stock:28,category:'Vegetables',organic:true},
-  {id:'2',name:'Baby Spinach',price:35,unit:'bag',farmer:'Sunrise Organics',location:'KwaZulu-Natal',emoji:'🥬',stock:15,category:'Vegetables',organic:true},
-  {id:'3',name:'Free-range Eggs',price:85,unit:'dozen',farmer:'Happy Hen Farm',location:'Western Cape',emoji:'🥚',stock:8,category:'Dairy',organic:false},
-  {id:'4',name:'Strawberries',price:55,unit:'punnet',farmer:'Berry Bliss Farm',location:'Limpopo',emoji:'🍓',stock:20,category:'Fruits',organic:true},
-  {id:'5',name:'Raw Honey',price:120,unit:'jar',farmer:'Golden Hive',location:'Gauteng',emoji:'🍯',stock:12,category:'Herbs',organic:true},
-  {id:'6',name:'Butternut Squash',price:18,unit:'each',farmer:'Green Valley Farm',location:'Mpumalanga',emoji:'🎃',stock:30,category:'Vegetables',organic:false},
-  {id:'7',name:'Avocados',price:12,unit:'each',farmer:'Avo Grove',location:'Limpopo',emoji:'🥑',stock:45,category:'Fruits',organic:true},
-  {id:'8',name:'Fresh Milk',price:25,unit:'litre',farmer:'Meadow Dairy',location:'Free State',emoji:'🥛',stock:20,category:'Dairy',organic:false},
-  {id:'9',name:'Sweet Corn',price:8,unit:'each',farmer:'Sunrise Organics',location:'KwaZulu-Natal',emoji:'🌽',stock:60,category:'Vegetables',organic:false},
-  {id:'10',name:'Fresh Basil',price:25,unit:'bunch',farmer:'Herb Haven',location:'Gauteng',emoji:'🌿',stock:10,category:'Herbs',organic:true},
-  {id:'11',name:'Wheat Flour',price:45,unit:'2kg bag',farmer:'Mill Stone Farm',location:'North West',emoji:'🌾',stock:25,category:'Grains',organic:false},
-  {id:'12',name:'Peaches',price:40,unit:'kg',farmer:'Orchard Gold',location:'Western Cape',emoji:'🍑',stock:18,category:'Fruits',organic:false},
+  {id:'1',name:'Roma Tomatoes',price:22,unit:'kg',farmer:'Green Valley Farm',location:'Vaal Region',emoji:'🍅',image:'https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=400&q=80',stock:28,category:'Vegetables',organic:true},
+  {id:'2',name:'Baby Spinach',price:35,unit:'bag',farmer:'Sunrise Organics',location:'Vaal Region',emoji:'🥬',image:'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&q=80',stock:15,category:'Vegetables',organic:true},
+  {id:'3',name:'Free-range Eggs',price:85,unit:'dozen',farmer:'Happy Hen Farm',location:'Vaal Region',emoji:'🥚',image:'https://images.unsplash.com/photo-1518569656558-1f25e69d2049?w=400&q=80',stock:8,category:'Dairy',organic:false},
+  {id:'4',name:'Strawberries',price:55,unit:'punnet',farmer:'Berry Bliss Farm',location:'Vaal Region',emoji:'🍓',image:'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=400&q=80',stock:20,category:'Fruits',organic:true},
+  {id:'5',name:'Raw Honey',price:120,unit:'jar',farmer:'Golden Hive',location:'Vaal Region',emoji:'🍯',image:'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&q=80',stock:12,category:'Herbs',organic:true},
+  {id:'6',name:'Butternut Squash',price:18,unit:'each',farmer:'Green Valley Farm',location:'Vaal Region',emoji:'🎃',image:'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=400&q=80',stock:30,category:'Vegetables',organic:false},
+  {id:'7',name:'Avocados',price:12,unit:'each',farmer:'Avo Grove',location:'Vaal Region',emoji:'🥑',image:'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=400&q=80',stock:45,category:'Fruits',organic:true},
+  {id:'8',name:'Fresh Milk',price:25,unit:'litre',farmer:'Meadow Dairy',location:'Vaal Region',emoji:'🥛',image:'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&q=80',stock:20,category:'Dairy',organic:false},
+  {id:'9',name:'Sweet Corn',price:8,unit:'each',farmer:'Sunrise Organics',location:'Vaal Region',emoji:'🌽',image:'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400&q=80',stock:60,category:'Vegetables',organic:false},
+  {id:'10',name:'Fresh Basil',price:25,unit:'bunch',farmer:'Herb Haven',location:'Vaal Region',emoji:'🌿',image:'https://images.unsplash.com/photo-1618375531912-867984bdfd87?w=400&q=80',stock:10,category:'Herbs',organic:true},
+  {id:'11',name:'Wheat Flour',price:45,unit:'2kg bag',farmer:'Mill Stone Farm',location:'Vaal Region',emoji:'🌾',image:'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&q=80',stock:25,category:'Grains',organic:false},
+  {id:'12',name:'Peaches',price:40,unit:'kg',farmer:'Orchard Gold',location:'Vaal Region',emoji:'🍑',image:'https://images.unsplash.com/photo-1629828874514-f0771c8d5e91?w=400&q=80',stock:18,category:'Fruits',organic:false},
 ];
 
 const farmers = [
@@ -43,7 +43,10 @@ function showPage(name) {
   if (page) page.classList.add('active');
   window.scrollTo(0,0);
   if (name === 'marketplace') renderProducts(products);
-  if (name === 'home') renderFeatured();
+  if (name === 'home') {
+    renderFeatured();
+    setTimeout(() => { if (typeof initMaps === 'function') initMaps('home'); }, 150);
+  }
   if (name === 'farmers') renderFarmers();
   if (name === 'cart') renderCart();
   if (name === 'checkout') {
@@ -62,10 +65,15 @@ function showPage(name) {
 
 // PRODUCTS
 function renderProductCard(p) {
+  const imgSrc = p.image || '';
+  const imgHtml = imgSrc
+    ? `<img src="${imgSrc}" alt="${p.name}" class="product-img" onerror="this.parentElement.innerHTML='<div class=product-img-placeholder>${p.emoji}</div>'" />`
+    : `<div class="product-img-placeholder">${p.emoji}</div>`;
   return `<div class="product-card" onclick="addToCart('${p.id}')">
-    <div class="product-img-placeholder">${p.emoji}</div>
+    <div class="product-img-wrap">${imgHtml}</div>
+    ${p.organic ? '<div class="product-organic-badge">Organic</div>' : ''}
     <div class="product-body">
-      <div class="product-cat">${p.category}${p.organic ? ' · Organic' : ''}</div>
+      <div class="product-cat">${p.category}</div>
       <div class="product-name">${p.name}</div>
       <div class="product-farmer">by ${p.farmer} · ${p.location}</div>
       <div class="product-footer">
@@ -209,7 +217,11 @@ function renderCheckout() {
   if (coCom) coCom.textContent = 'R' + commission.toFixed(2);
   if (coTot) coTot.textContent = 'R' + total.toFixed(2);
 
-  // Pre-fill delivery details from saved profile
+  // Hide payment step initially
+  const payStep = document.getElementById('payment-step');
+  if (payStep) payStep.style.display = 'none';
+
+  // Pre-fill from saved profile
   if (currentProfile) {
     const phoneEl = document.getElementById('checkout-phone');
     const addrEl  = document.getElementById('delivery-address-input');
@@ -218,15 +230,36 @@ function renderCheckout() {
     if (addrEl  && currentProfile.delivery_address) addrEl.value  = currentProfile.delivery_address;
     if (display && currentProfile.delivery_address) {
       display.textContent = '📍 ' + currentProfile.delivery_address;
-      // Pre-set selectedDelivery so order saves correctly
       if (typeof selectedDelivery !== 'undefined') {
         selectedDelivery = { address: currentProfile.delivery_address };
       }
     }
   }
 
-  // Init map after short delay so container is visible
-  setTimeout(() => { if (typeof initMaps === 'function') initMaps('checkout'); }, 100);
+  // Init Leaflet map
+  setTimeout(() => { if (typeof initMaps === 'function') initMaps('checkout'); }, 150);
+}
+
+function confirmDeliveryAndPay() {
+  const delivery = typeof getDeliveryDetails === 'function' ? getDeliveryDetails() : null;
+  const manualAddr = document.getElementById('delivery-address-input')?.value?.trim();
+  const finalAddress = delivery?.address || manualAddr || currentProfile?.delivery_address;
+
+  if (!finalAddress || finalAddress === 'Click the map or search to set your delivery location') {
+    showToast('Please set your delivery address on the map first 📍', 'error'); return;
+  }
+
+  const phone = document.getElementById('checkout-phone')?.value?.trim() || currentProfile?.phone;
+  if (!phone) {
+    showToast('Please enter your phone number for delivery 📞', 'error'); return;
+  }
+
+  // Show payment step
+  const payStep = document.getElementById('payment-step');
+  const label   = document.getElementById('confirmed-address-label');
+  if (payStep) { payStep.style.display = 'block'; payStep.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  if (label)   label.textContent = finalAddress;
+  showToast('Address confirmed! ✅ Now choose your payment method.', 'success');
 }
 
 async function placeOrder() {
@@ -450,12 +483,17 @@ async function loadProfileOrders() {
     const statusClass = statusColors[o.status] || 'badge-blue';
     const statusLabel = statusLabels[o.status] || o.status;
     return `<div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--gray-50);border-radius:var(--radius-sm);margin-bottom:10px">
-      <div>
+      <div style="flex:1">
         <div style="font-weight:600;font-size:14px;color:var(--gray-900)">#${shortId} — ${itemNames}</div>
         <div style="font-size:12px;color:var(--gray-500);margin-top:2px">${date}</div>
         <div style="font-size:13px;color:var(--green-700);margin-top:4px;font-weight:500">R${Number(o.total).toFixed(2)} total</div>
       </div>
-      <span class="badge ${statusClass}">${statusLabel}</span>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span class="badge ${statusClass}">${statusLabel}</span>
+        <button onclick="deleteOrder('${o.id}')" title="Delete order"
+          style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--gray-400);padding:4px;border-radius:4px;transition:color 0.15s"
+          onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--gray-400)'">🗑</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -506,4 +544,23 @@ async function sendPasswordReset() {
   const { error } = await db.auth.resetPasswordForEmail(email);
   if (error) { showToast(error.message, 'error'); return; }
   showToast('Password reset email sent to ' + email, 'success');
+}
+
+async function deleteOrder(orderId) {
+  if (!currentUser) return;
+  if (!confirm('Delete this order from your history?')) return;
+
+  const { error } = await db
+    .from('orders')
+    .delete()
+    .eq('id', orderId)
+    .eq('buyer_id', currentUser.id); // safety: only delete own orders
+
+  if (error) {
+    showToast('Failed to delete order: ' + error.message, 'error');
+    return;
+  }
+
+  showToast('Order removed from your history', 'success');
+  await loadProfileOrders(); // refresh the list
 }
