@@ -28,10 +28,16 @@ async function initAuth() {
       await handleOAuthRedirect();
       await resolveProfile(session.user);
       updateNav();
-      // If redirected back from Google, go to marketplace
+      // If redirected back from Google, go to marketplace or intended page
       if (window.location.hash.includes('access_token')) {
-        showPage('marketplace');
+        const redirect = window._redirectAfterLogin || 'marketplace';
+        window._redirectAfterLogin = null;
+        showPage(redirect);
         showToast('Welcome! 👋', 'success');
+      } else if (window._redirectAfterLogin) {
+        const redirect = window._redirectAfterLogin;
+        window._redirectAfterLogin = null;
+        showPage(redirect);
       }
     } else if (event === 'SIGNED_OUT') {
       currentUser = null;
@@ -229,28 +235,44 @@ async function loadProducts() {
 // ============================================================
 //  ORDERS — save on checkout
 // ============================================================
-async function saveOrder(cart) {
-  if (!currentUser) return;
+async function saveOrder(cart, deliveryAddress = null, phone = null) {
+  if (!currentUser) return null;
 
   const subtotal   = cart.reduce((s, x) => s + x.price * x.qty, 0);
   const commission = subtotal * COMMISSION_RATE;
   const total      = subtotal + commission + DELIVERY_FEE;
 
-  const { error } = await db.from('orders').insert({
+  const { data: order, error } = await db.from('orders').insert({
     buyer_id:         currentUser.id,
     buyer_name:       currentProfile?.name || null,
     buyer_email:      currentProfile?.email || currentUser.email,
-    buyer_phone:      currentProfile?.phone || null,
-    delivery_address: currentProfile?.delivery_address || null,
+    buyer_phone:      phone || currentProfile?.phone || null,
+    delivery_address: deliveryAddress || currentProfile?.delivery_address || null,
     items:            cart,
     subtotal,
     commission,
     delivery_fee:     DELIVERY_FEE,
     total,
     status:           'pending',
-  });
+  }).select().single();
 
-  if (error) console.error('Order save error:', error.message);
+  if (error) {
+    console.error('Order save error:', error.message);
+    return null;
+  }
+
+  // Update buyer profile phone/address if not already saved
+  if (currentProfile && (phone || deliveryAddress)) {
+    const updates = {};
+    if (phone && !currentProfile.phone) updates.phone = phone;
+    if (deliveryAddress && !currentProfile.delivery_address) updates.delivery_address = deliveryAddress;
+    if (Object.keys(updates).length > 0) {
+      await db.from('buyers').update(updates).eq('id', currentUser.id);
+      Object.assign(currentProfile, updates);
+    }
+  }
+
+  return order;
 }
 
 // ============================================================
