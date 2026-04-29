@@ -1,4 +1,4 @@
-  :root {
+:root {
     --green-50: #f0fdf4; --green-100: #dcfce7; --green-200: #bbf7d0;
     --green-500: #22c55e; --green-600: #16a34a; --green-700: #15803d;
     --green-800: #166534; --green-900: #14532d;
@@ -300,3 +300,47 @@
     .hero-title { font-size: 28px; }
     .commission-items { flex-direction: column; gap: 6px; }
   }
+
+.product-img-wrap {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: var(--green-50);
+}
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.product-card:hover .product-img {
+  transform: scale(1.05);
+}
+.product-img-placeholder {
+  height: 160px;
+  background: linear-gradient(135deg, var(--green-50), var(--green-100));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+.product-organic-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--green-600);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  z-index: 1;
+}
+.product-card {
+  position: relative;
+  overflow: hidden;
+}
