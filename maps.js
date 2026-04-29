@@ -409,26 +409,32 @@ function initHeroMap() {
 
     heroMap = L.map('hero-map', {
       zoomControl:     false,
-      dragging:        false,
+      dragging:        true,
       touchZoom:       false,
       scrollWheelZoom: false,
       doubleClickZoom: false,
       boxZoom:         false,
       keyboard:        false,
-    }).setView(VAAL_CENTER, 10);
+    }).setView(VAAL_CENTER, 11);
 
     addTileLayer(heroMap);
 
+    // Add farm markers with popups
     VAAL_FARMS.forEach(farm => {
-      L.circleMarker([farm.lat, farm.lng], {
-        radius:      9,
-        fillColor:   '#16a34a',
-        color:       '#fff',
-        weight:      2,
-        opacity:     1,
-        fillOpacity: 0.9,
-      }).addTo(heroMap).bindTooltip(farm.name, { permanent: false });
+      L.marker([farm.lat, farm.lng], { icon: createFarmIcon(farm.emoji) })
+        .addTo(heroMap)
+        .bindPopup(`
+          <div style="font-family:'DM Sans',sans-serif;padding:4px;min-width:180px">
+            <div style="font-size:14px;font-weight:600;color:#111827;margin-bottom:2px">${farm.name}</div>
+            <div style="font-size:12px;color:#6b7280;margin-bottom:4px">📍 ${farm.area}, Vaal Region</div>
+            <div style="font-size:12px;color:#16a34a">${farm.products.join(' · ')}</div>
+          </div>
+        `, { maxWidth: 200 });
     });
+
+    // Fit map to show all farms
+    const bounds = L.latLngBounds(VAAL_FARMS.map(f => [f.lat, f.lng]));
+    heroMap.fitBounds(bounds, { padding: [30, 30] });
   });
 }
 
@@ -441,19 +447,18 @@ function initMaps(page) {
   if (page === 'home')        initHeroMap();
 }
 
+// Also init hero map on DOMContentLoaded since home is the default page
+document.addEventListener('DOMContentLoaded', () => {
+  loadLeaflet(() => {
+    console.log('✅ Leaflet ready — Vaal Region');
+    // Init hero map since home page is active on load
+    setTimeout(initHeroMap, 200);
+  });
+});
+
 // ============================================================
 //  GET SELECTED DELIVERY FOR ORDER SAVING
 // ============================================================
 function getDeliveryDetails() {
   return selectedDelivery;
 }
-
-// ============================================================
-//  AUTO INIT ON LOAD
-// ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-  loadLeaflet(() => {
-    // Pre-load Leaflet so first map open is instant
-    console.log('✅ Leaflet loaded — Vaal Region maps ready');
-  });
-});
