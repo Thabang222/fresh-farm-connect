@@ -250,8 +250,8 @@ const products = [
   {id:'4',  name:'Butternut',        price:15, unit:'each',   farmer:'Green Valley Farm',  location:'Vaal Region', emoji:'🎃', image:'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=400&q=80', stock:35, category:'Vegetables', organic:false},
   {id:'5',  name:'Onions',           price:12, unit:'kg',     farmer:'Sunrise Organics',   location:'Vaal Region', emoji:'🧅', image:'https://images.unsplash.com/photo-1508747703725-719777637510?w=400&q=80', stock:50, category:'Vegetables', organic:false},
   {id:'6',  name:'Green Pepper',     price:18, unit:'kg',     farmer:'Happy Hen Farm',     location:'Vaal Region', emoji:'🫑', image:'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=400&q=80', stock:20, category:'Vegetables', organic:false},
-  {id:'7',  name:'Sweet Potato',     price:14, unit:'kg',     farmer:'Meadow Dairy',       location:'Vaal Region', emoji:'🍠', image:'https://images.unsplash.com/photo-1596097635121-14b38c5d7a27?w=400&q=80&fit=crop&auto=format', stock:45, category:'Vegetables', organic:false},
-  {id:'8',  name:'Beetroot',         price:12, unit:'bunch',  farmer:'Sunrise Organics',   location:'Vaal Region', emoji:'🫀', image:'https://images.unsplash.com/photo-1593113598513-8f4e6ab3ca83?w=400&q=80', stock:20, category:'Vegetables', organic:false},
+  {id:'7',  name:'Sweet Potato',     price:14, unit:'kg',     farmer:'Meadow Dairy',       location:'Vaal Region', emoji:'🍠', image:'https://images.unsplash.com/photo-1596097635121-14b38c5d7a27?w=400&q=80', stock:45, category:'Vegetables', organic:false},
+  {id:'8',  name:'Beetroot',         price:12, unit:'bunch',  farmer:'Sunrise Organics',   location:'Vaal Region', emoji:'🫀', image:'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=400&q=80', stock:20, category:'Vegetables', organic:false},
   {id:'9',  name:'Carrots',          price:10, unit:'bunch',  farmer:'Green Valley Farm',  location:'Vaal Region', emoji:'🥕', image:'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&q=80', stock:40, category:'Vegetables', organic:false},
   {id:'10', name:'Mealies (Corn)',   price:5,  unit:'each',   farmer:'Sunrise Organics',   location:'Vaal Region', emoji:'🌽', image:'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400&q=80', stock:60, category:'Vegetables', organic:false},
   {id:'11', name:'Pumpkin',          price:20, unit:'each',   farmer:'Green Valley Farm',  location:'Vaal Region', emoji:'🎃', image:'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=400&q=80', stock:15, category:'Vegetables', organic:false},
@@ -262,7 +262,7 @@ const products = [
   {id:'15', name:'Oranges',          price:20, unit:'kg',     farmer:'Orchard Gold',       location:'Vaal Region', emoji:'🍊', image:'https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=400&q=80', stock:35, category:'Fruits',     organic:false},
   {id:'16', name:'Avocados',         price:10, unit:'each',   farmer:'Avo Grove',          location:'Vaal Region', emoji:'🥑', image:'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=400&q=80', stock:50, category:'Fruits',     organic:false},
   {id:'17', name:'Mangoes',          price:12, unit:'each',   farmer:'Golden Hive',        location:'Vaal Region', emoji:'🥭', image:'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&q=80', stock:30, category:'Fruits',     organic:false},
-  {id:'18', name:'Watermelon',       price:35, unit:'each',   farmer:'Berry Bliss Farm',   location:'Vaal Region', emoji:'🍉', image:'https://images.unsplash.com/photo-1563114773-84221bd62daa?w=400&q=80', stock:12, category:'Fruits',     organic:false},
+  {id:'18', name:'Watermelon',       price:35, unit:'each',   farmer:'Berry Bliss Farm',   location:'Vaal Region', emoji:'🍉', image:'https://images.unsplash.com/photo-1568909344668-6f14a07b56a0?w=400&q=80', stock:12, category:'Fruits',     organic:false},
   // Eggs & Dairy
   {id:'19', name:'Free-range Eggs',  price:75, unit:'dozen',  farmer:'Happy Hen Farm',     location:'Vaal Region', emoji:'🥚', image:'https://images.unsplash.com/photo-1491524062933-cb0289261700?w=400&q=80', stock:20, category:'Eggs',       organic:false},
   {id:'20', name:'Farm Eggs (6)',    price:40, unit:'pack',   farmer:'Happy Hen Farm',     location:'Vaal Region', emoji:'🥚', image:'https://images.unsplash.com/photo-1498654077810-12c21d4d6dc3?w=400&q=80', stock:30, category:'Eggs',       organic:false},
@@ -288,8 +288,82 @@ const farmerListings = [
 
 let cart = [];
 let activeFilter = 'All';
-const COMMISSION_RATE = 0.08;
-const DELIVERY_FEE = 45;
+const COMMISSION_RATE = 0.10;
+
+// ============================================================
+//  DELIVERY ZONES — distance-based pricing from farm hub
+//  Vanderbijlpark → VUT area = R10
+//  Vereeniging / Three Rivers  = R20
+//  Sebokeng / Evaton / Sasolburg = R30
+// ============================================================
+const DELIVERY_ZONES = [
+  {
+    id: 'zone1',
+    label: 'Zone 1 — Vanderbijlpark & VUT',
+    fee: 10,
+    keywords: ['vanderbijlpark','vanderbijl park','vut','vaal university','frikkie meyer','tshepiso','boipatong','bophelong'],
+    description: 'Vanderbijlpark / VUT area — R10',
+  },
+  {
+    id: 'zone2',
+    label: 'Zone 2 — Vereeniging & Three Rivers',
+    fee: 20,
+    keywords: ['vereeniging','three rivers','bedworth','roshnee','duncanville'],
+    description: 'Vereeniging / Three Rivers — R20',
+  },
+  {
+    id: 'zone3',
+    label: 'Zone 3 — Sebokeng, Evaton & surrounds',
+    fee: 30,
+    keywords: ['sebokeng','evaton','orange farm','meyerton','henley on klip','henley-on-klip','walkerville','sasolburg'],
+    description: 'Sebokeng / Evaton / Sasolburg — R30',
+  },
+];
+
+let currentDeliveryFee  = 0;    // updated when address is confirmed
+let currentDeliveryZone = null;
+
+function detectDeliveryZone(address) {
+  if (!address) return null;
+  const lower = address.toLowerCase();
+  for (const zone of DELIVERY_ZONES) {
+    if (zone.keywords.some(kw => lower.includes(kw))) return zone;
+  }
+  return null;
+}
+
+function applyDeliveryZone(address) {
+  const zone = detectDeliveryZone(address);
+  currentDeliveryZone = zone;
+  currentDeliveryFee  = zone ? zone.fee : 0;
+
+  const feeEl    = document.getElementById('co-delivery-fee');
+  const zoneEl   = document.getElementById('co-delivery-zone');
+  const feeCartEl = document.getElementById('sum-delivery');
+
+  if (zone) {
+    if (feeEl)    feeEl.textContent    = 'R' + zone.fee;
+    if (zoneEl)   zoneEl.textContent   = zone.description;
+    if (feeCartEl) feeCartEl.textContent = 'R' + zone.fee;
+  } else {
+    if (feeEl)    feeEl.textContent    = 'TBD';
+    if (zoneEl)   zoneEl.textContent   = 'Address outside known zones — we will confirm fee';
+    if (feeCartEl) feeCartEl.textContent = 'TBD';
+  }
+  updateCheckoutTotals();
+}
+
+function updateCheckoutTotals() {
+  const subtotal   = cart.reduce((s,x) => s + x.price * x.qty, 0);
+  const commission = subtotal * COMMISSION_RATE;
+  const total      = subtotal + commission + currentDeliveryFee;
+  const coSub = document.getElementById('co-subtotal');
+  const coCom = document.getElementById('co-commission');
+  const coTot = document.getElementById('co-total');
+  if (coSub) coSub.textContent = 'R' + subtotal.toFixed(2);
+  if (coCom) coCom.textContent = 'R' + commission.toFixed(2);
+  if (coTot) coTot.textContent = 'R' + total.toFixed(2);
+}
 
 // PAGES
 function showPage(name) {
@@ -424,7 +498,8 @@ function renderCart() {
   empty.classList.add('hidden'); content.classList.remove('hidden');
   const subtotal = cart.reduce((s,x) => s + x.price * x.qty, 0);
   const commission = subtotal * COMMISSION_RATE;
-  const total = subtotal + commission + DELIVERY_FEE;
+  const deliveryDisplay = currentDeliveryFee > 0 ? 'R' + currentDeliveryFee : 'Calculated at checkout';
+  const total = subtotal + commission;
   document.getElementById('cart-items-list').innerHTML = cart.map(item => `
     <div class="cart-item">
       <div class="cart-item-img">${item.emoji}</div>
@@ -445,7 +520,8 @@ function renderCart() {
     </div>`).join('');
   document.getElementById('sum-subtotal').textContent = 'R' + subtotal.toFixed(2);
   document.getElementById('sum-commission').textContent = 'R' + commission.toFixed(2);
-  document.getElementById('sum-total').textContent = 'R' + total.toFixed(2);
+  document.getElementById('sum-delivery').textContent = currentDeliveryFee > 0 ? 'R' + currentDeliveryFee : 'Set at checkout';
+  document.getElementById('sum-total').textContent = 'R' + (total + currentDeliveryFee).toFixed(2);
 }
 
 function changeQty(id, delta) {
@@ -467,7 +543,7 @@ function removeFromCart(id) {
 function renderCheckout() {
   const subtotal = cart.reduce((s,x) => s + x.price * x.qty, 0);
   const commission = subtotal * COMMISSION_RATE;
-  const total = subtotal + commission + DELIVERY_FEE;
+  const total = subtotal + commission + currentDeliveryFee;
   const items = document.getElementById('checkout-items');
   if (items) items.innerHTML = cart.map(i => `<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>${i.emoji} ${i.name} ×${i.qty}</span><span>R${i.price * i.qty}</span></div>`).join('');
   const coSub = document.getElementById('co-subtotal');
@@ -490,6 +566,8 @@ function renderCheckout() {
       if (typeof selectedDelivery !== 'undefined') {
         selectedDelivery = { address: currentProfile.delivery_address };
       }
+      // Apply zone fee based on saved address
+      if (typeof applyDeliveryZone === 'function') applyDeliveryZone(currentProfile.delivery_address);
     }
   }
 
@@ -535,7 +613,7 @@ async function placeOrder() {
   const confirmTime  = document.getElementById('confirm-time');
   if (confirmId)    confirmId.textContent    = 'Order #' + shortId;
   if (confirmItems) confirmItems.textContent = cart.map(i => i.emoji + ' ' + i.name + ' ×' + i.qty).join(', ');
-  if (confirmTotal) confirmTotal.textContent = 'R' + cart.reduce((s,x) => s + x.price * x.qty, 0).toFixed(2) + ' + R45 delivery';
+  if (confirmTotal) confirmTotal.textContent = 'R' + cart.reduce((s,x) => s + x.price * x.qty, 0).toFixed(2) + (currentDeliveryFee > 0 ? ' + R' + currentDeliveryFee + ' delivery' : '');
   if (confirmTime)  confirmTime.textContent  = new Date().toLocaleTimeString('en-ZA', { hour:'2-digit', minute:'2-digit' });
 
   cart = [];
