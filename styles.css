@@ -301,6 +301,7 @@
     .commission-items { flex-direction: column; gap: 6px; }
   }
 
+/* ── Product Images ── */
 .product-img-wrap {
   position: relative;
   height: 160px;
@@ -313,10 +314,10 @@
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
+  display: block;
 }
-.product-card:hover .product-img {
-  transform: scale(1.05);
-}
+.product-card:hover .product-img { transform: scale(1.04); }
+.product-card { position: relative; overflow: hidden; cursor: pointer; }
 .product-img-placeholder {
   height: 160px;
   background: linear-gradient(135deg, var(--green-50), var(--green-100));
@@ -325,22 +326,4 @@
   justify-content: center;
   font-size: 48px;
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-}
-.product-organic-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: var(--green-600);
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 99px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  z-index: 1;
-}
-.product-card {
-  position: relative;
-  overflow: hidden;
 }
