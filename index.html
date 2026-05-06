@@ -28,7 +28,7 @@
     <div class="nav-links">
       <button class="nav-link" onclick="showPage('marketplace')">Shop</button>
       <button class="nav-link" onclick="showPage('farmers')">Farmers</button>
-      <button id="nav-dashboard-btn" class="nav-link" onclick="showPage('dashboard')">My Farm</button>
+      <button id="nav-dashboard-btn" class="nav-link" onclick="currentRole==='farmer'?showPage('dashboard'):showPage('profile')">My Farm</button>
       <button id="nav-signin-btn" class="nav-link" onclick="showPage('login')">Sign in</button>
       <button id="nav-user-btn" class="nav-link hidden" onclick="showPage('profile')">👤 <span id="nav-user-label">Account</span></button>
       <button class="nav-link nav-cart" onclick="showPage('cart')">
@@ -62,7 +62,7 @@
           <p class="hero-sub">Connect directly with local South African farmers. Order fresh, organic fruits and vegetables. Support sustainable agriculture while enjoying premium quality produce.</p>
           <div class="hero-actions">
             <button class="btn btn-primary" onclick="showPage('marketplace')" style="padding:12px 28px;font-size:15px">Start Shopping</button>
-            <button class="btn btn-outline" onclick="showPage('signup')" style="padding:12px 28px;font-size:15px">Join as Farmer</button>
+            <button class="btn btn-outline" onclick="showPage('signup-buyer')" style="padding:12px 28px;font-size:15px">Join as Farmer</button>
           </div>
           <div class="hero-stats">
             <div><div class="hero-stat-val">150+</div><div class="hero-stat-lbl">Local farmers</div></div>
@@ -72,7 +72,7 @@
         </div>
         <div>
           <div class="hero-visual">
-            <div id="hero-map" style="height:260px;border-radius:var(--radius);overflow:hidden;border:2px solid var(--green-100);box-shadow:var(--shadow-lg)"></div>
+            <div id="hero-map" style="height:260px;border-radius:var(--radius);overflow:hidden;border:2px solid var(--green-100)"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
               <div style="background:var(--green-50);border-radius:var(--radius-sm);padding:12px">
                 <div style="font-size:22px;margin-bottom:4px">🍅</div>
@@ -137,7 +137,7 @@
           <div class="footer-heading">Platform</div>
           <div class="footer-link" onclick="showPage('marketplace')">Marketplace</div>
           <div class="footer-link" onclick="showPage('farmers')">Our Farmers</div>
-          <div class="footer-link" onclick="showPage('signup')">Sell on FFC</div>
+          <div class="footer-link" onclick="showPage('signup-buyer')">Sell on FFC</div>
         </div>
         <div>
           <div class="footer-heading">How we earn</div>
@@ -168,43 +168,14 @@
       <div style="font-size:13px;color:var(--gray-500)">Harvested within 48 hours</div>
     </div>
 
-    <!-- MAP -->
+    <!-- MAP — Real Leaflet, Vaal Region -->
     <div class="map-section">
       <div class="section-card" style="padding:16px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="font-weight:600;font-size:14px;color:var(--gray-800)">🗺️ Farms near you — Johannesburg</div>
-          <span class="badge badge-green">Google Maps API required for live map</span>
+          <div style="font-weight:600;font-size:14px;color:var(--gray-800)">🗺️ Farms near you — Vaal Region</div>
+          <span class="badge badge-green">Live map</span>
         </div>
-        <div class="map-container">
-          <div style="width:100%;height:100%;background:linear-gradient(135deg,#e8f5e9 0%,#c8e6c9 50%,#a5d6a7 100%);position:relative;overflow:hidden">
-            <!-- Simulated map grid -->
-            <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.15" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <line x1="25" y1="0" x2="25" y2="100" stroke="#388e3c" stroke-width="0.5"/>
-              <line x1="50" y1="0" x2="50" y2="100" stroke="#388e3c" stroke-width="0.5"/>
-              <line x1="75" y1="0" x2="75" y2="100" stroke="#388e3c" stroke-width="0.5"/>
-              <line x1="0" y1="33" x2="100" y2="33" stroke="#388e3c" stroke-width="0.5"/>
-              <line x1="0" y1="66" x2="100" y2="66" stroke="#388e3c" stroke-width="0.5"/>
-            </svg>
-            <!-- Demo pins -->
-            <div class="demo-pin" style="top:35%;left:40%">
-              <div class="demo-pin-label">Green Valley Farm</div>
-              <div class="demo-pin-dot"></div>
-            </div>
-            <div class="demo-pin" style="top:55%;left:60%">
-              <div class="demo-pin-label">Sunrise Organics</div>
-              <div class="demo-pin-dot"></div>
-            </div>
-            <div class="demo-pin" style="top:25%;left:65%">
-              <div class="demo-pin-label">Happy Hen Farm</div>
-              <div class="demo-pin-dot"></div>
-            </div>
-            <div class="demo-pin" style="top:65%;left:28%">
-              <div class="demo-pin-label">Golden Hive</div>
-              <div class="demo-pin-dot"></div>
-            </div>
-            <div style="position:absolute;bottom:12px;right:12px;background:white;border-radius:8px;padding:8px 12px;font-size:12px;color:var(--gray-600);box-shadow:var(--shadow)">📍 Connect Google Maps API to activate live map</div>
-          </div>
-        </div>
+        <div id="marketplace-map" style="height:280px;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--gray-200)"></div>
       </div>
     </div>
 
@@ -220,9 +191,7 @@
       <button class="filter-chip active" onclick="setFilter('All',this)">All</button>
       <button class="filter-chip" onclick="setFilter('Vegetables',this)">Vegetables</button>
       <button class="filter-chip" onclick="setFilter('Fruits',this)">Fruits</button>
-      <button class="filter-chip" onclick="setFilter('Dairy',this)">Dairy & Eggs</button>
-      <button class="filter-chip" onclick="setFilter('Grains',this)">Grains</button>
-      <button class="filter-chip" onclick="setFilter('Herbs',this)">Herbs</button>
+      <button class="filter-chip" onclick="setFilter('Eggs',this)">Eggs</button>
     </div>
 
     <div class="products-grid" id="products-grid"></div>
@@ -280,48 +249,38 @@
   <div class="page-content">
     <h1 style="font-family:var(--font-display);font-size:28px;color:var(--gray-900);margin-bottom:24px">Checkout</h1>
     <div class="checkout-layout">
-
-      <!-- LEFT COLUMN -->
       <div>
+
         <!-- STEP 1: Delivery Address -->
         <div class="card" style="padding:20px;margin-bottom:16px">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-            <div style="width:28px;height:28px;background:var(--green-600);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">1</div>
-            <div style="font-weight:600;font-size:16px;color:var(--gray-900)">Delivery Address</div>
-          </div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:14px;padding-left:38px">Search your address or click the map — Vaal Region only</div>
+          <div style="font-weight:600;font-size:16px;margin-bottom:4px;color:var(--gray-900)">📍 Step 1 — Delivery Address</div>
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:14px">Search your address or click on the map to drop a pin. It saves automatically.</div>
 
+          <!-- Address search -->
           <div style="display:flex;gap:8px;margin-bottom:12px">
-            <input id="delivery-address-input" class="input" type="text" placeholder="e.g. Piet Retief Blvd, Vanderbijlpark" style="flex:1" />
+            <input id="delivery-address-input" class="input" type="text" placeholder="e.g. 12 Frikkie Meyer Blvd, Vanderbijlpark" style="flex:1" />
             <button id="delivery-search-btn" class="btn btn-primary" style="padding:10px 16px;white-space:nowrap" onclick="searchDeliveryAddress(document.getElementById('delivery-address-input').value)">Search</button>
           </div>
 
+          <!-- Leaflet map -->
           <div id="checkout-map" style="height:300px;border-radius:var(--radius-sm);overflow:hidden;margin-bottom:12px;border:1px solid var(--gray-200)"></div>
 
-          <div id="delivery-address-display" style="font-size:13px;color:var(--gray-600);padding:10px 12px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-200);margin-bottom:12px">📍 Click the map or search to set your delivery location</div>
+          <!-- Confirmed address display -->
+          <div id="delivery-address-display" style="font-size:13px;color:var(--gray-600);min-height:18px;margin-bottom:14px;padding:10px 12px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-200)">📍 Click the map or search to set your delivery location</div>
 
-          <div class="form-group">
+          <!-- Phone number -->
+          <div class="form-group" style="margin-top:4px">
             <label class="label">Phone number for delivery</label>
             <input id="checkout-phone" class="input" type="tel" placeholder="082 000 0000" />
           </div>
-
-          <button class="btn btn-primary" style="width:100%;margin-top:14px;padding:12px" onclick="confirmDeliveryAndPay()">
-            Confirm address & proceed to payment →
-          </button>
         </div>
 
-        <!-- STEP 2: Payment — hidden until address confirmed -->
-        <div id="payment-step" class="card" style="padding:20px;margin-bottom:16px;display:none">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-            <div style="width:28px;height:28px;background:var(--green-600);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">2</div>
-            <div style="font-weight:600;font-size:16px;color:var(--gray-900)">Payment Method</div>
-          </div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:14px;padding-left:38px">Secure payment powered by PayFast</div>
+        <!-- STEP 2: Payment Method -->
+        <div class="card" style="padding:20px;margin-bottom:16px">
+          <div style="font-weight:600;font-size:16px;margin-bottom:4px;color:var(--gray-900)">💳 Step 2 — Payment Method</div>
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:14px">Secure payment powered by PayFast</div>
 
-          <div style="background:var(--green-50);border:1px solid var(--green-100);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:14px;font-size:13px;color:var(--green-700)">
-            📍 Delivering to: <span id="confirmed-address-label" style="font-weight:600"></span>
-          </div>
-
+        <div class="card" style="padding:0;margin-bottom:0;border:none">
           <div class="payment-methods">
             <div class="payment-method active" data-method="card" onclick="selectPayment(this)">💳 Card</div>
             <div class="payment-method" data-method="eft" onclick="selectPayment(this)">🏦 EFT</div>
@@ -338,7 +297,7 @@
         </div>
       </div>
 
-      <!-- RIGHT COLUMN: Order Summary -->
+      <!-- Order Summary -->
       <div>
         <div class="order-summary" style="position:sticky;top:80px">
           <div class="summary-title">Order Summary</div>
@@ -352,7 +311,6 @@
           <div class="summary-note" style="margin-top:10px">By placing your order you agree to our terms. Farmers receive 92% of the sale price after our 8% platform commission.</div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -410,64 +368,83 @@
 <!-- ========== FARMER DASHBOARD ========== -->
 <div id="page-dashboard" class="page">
   <div class="page-content">
-    <div class="dashboard-header">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
       <div>
-        <div class="dashboard-title">Farm Dashboard</div>
-        <div style="font-size:13px;color:var(--gray-500);margin-top:2px">Green Valley Farm · Mpumalanga</div>
+        <h1 style="font-family:var(--font-display);font-size:28px;color:var(--gray-900);margin-bottom:4px">
+          👨🏿‍🌾 <span id="farmer-dash-farm">My Farm</span>
+        </h1>
+        <div style="font-size:13px;color:var(--gray-500)"><span id="farmer-dash-name"></span> · <span id="farmer-dash-location">Vaal Region</span></div>
       </div>
-      <button class="btn btn-primary" onclick="showModal('add-listing-modal')">+ Add listing</button>
+      <button class="btn btn-outline btn-sm" onclick="handleSignOut()">Sign out</button>
     </div>
 
-    <!-- Commission info -->
-    <div class="commission-box">
-      <div class="commission-box-title">💰 How your earnings work</div>
-      <table class="commission-table">
-        <tr><td>Your listing price</td><td>R100.00</td></tr>
-        <tr><td>Platform commission (8%)</td><td>−R8.00</td></tr>
-        <tr><td>PayFast processing (~3.5%)</td><td>−R3.50</td></tr>
-        <tr><td style="font-weight:600;color:var(--green-800)">You receive</td><td style="font-weight:700;color:var(--green-800)">~R88.50</td></tr>
-      </table>
-      <div style="font-size:11px;color:var(--green-600);margin-top:8px">Delivery fee (R45/order) goes to logistics — not deducted from your earnings.</div>
+    <!-- Commission banner -->
+    <div style="background:var(--green-50);border:1px solid var(--green-200);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--green-700)">
+      💰 You keep <strong>92%</strong> of every sale. Platform takes 8% commission. R45 delivery fee is separate.
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-label">Revenue this month</div><div class="stat-value">R8,420</div><div class="stat-delta">↑ 12% vs last month</div></div>
-      <div class="stat-card"><div class="stat-label">Total orders</div><div class="stat-value">47</div><div class="stat-delta">↑ 5 this week</div></div>
-      <div class="stat-card"><div class="stat-label">Active listings</div><div class="stat-value">12</div><div class="stat-delta">3 low in stock</div></div>
-      <div class="stat-card"><div class="stat-label">Customer rating</div><div class="stat-value">4.9 ⭐</div><div class="stat-delta">38 reviews</div></div>
+    <!-- TAB BUTTONS -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--gray-100);padding-bottom:12px">
+      <button id="farmer-tab-btn-products" onclick="switchFarmerTab('products')" style="padding:8px 16px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;font-family:var(--font-body);background:var(--green-600);color:white;transition:all 0.15s">📦 My Products</button>
+      <button id="farmer-tab-btn-orders" onclick="switchFarmerTab('orders')" style="padding:8px 16px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;font-family:var(--font-body);background:transparent;color:var(--gray-600);transition:all 0.15s">🛒 Orders</button>
+      <button id="farmer-tab-btn-settings" onclick="switchFarmerTab('settings')" style="padding:8px 16px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;font-family:var(--font-body);background:transparent;color:var(--gray-600);transition:all 0.15s">⚙️ Settings</button>
     </div>
 
-    <div class="dashboard-grid">
-      <!-- Recent Orders -->
+    <!-- PRODUCTS TAB -->
+    <div id="farmer-tab-products">
+      <div class="section-card" style="margin-bottom:20px">
+        <div class="section-card-title">Add New Product</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+          <div class="form-group"><label class="label">Product name</label><input id="fp-name" class="input" type="text" placeholder="e.g. Tomatoes" /></div>
+          <div class="form-group"><label class="label">Emoji</label><input id="fp-emoji" class="input" type="text" placeholder="🍅" maxlength="4" /></div>
+          <div class="form-group"><label class="label">Price (R)</label><input id="fp-price" class="input" type="number" placeholder="14" min="1" /></div>
+          <div class="form-group"><label class="label">Unit</label><input id="fp-unit" class="input" type="text" placeholder="kg / bunch / each" /></div>
+          <div class="form-group"><label class="label">Stock quantity</label><input id="fp-stock" class="input" type="number" placeholder="50" min="1" /></div>
+          <div class="form-group"><label class="label">Category</label>
+            <select id="fp-category" class="input">
+              <option value="">Select category</option>
+              <option>Vegetables</option><option>Fruits</option><option>Eggs</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:4px">
+          <label class="label">Product image URL <span style="font-weight:400;color:var(--gray-400)">(optional)</span></label>
+          <input id="fp-image" class="input" type="url" placeholder="https://your-photo-link.com/image.jpg" />
+        </div>
+        <button id="fp-add-btn" class="btn btn-primary" style="margin-top:12px" onclick="addFarmerProduct()">+ Add Product</button>
+      </div>
+
       <div class="section-card">
-        <div class="section-card-title">Recent Orders <span class="badge badge-amber">3 pending</span></div>
-        <table class="orders-table">
-          <thead><tr><th>Order</th><th>Buyer</th><th>Amount</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>#1042</td><td>Sipho M.</td><td>R245</td><td><span class="badge badge-green">Delivered</span></td></tr>
-            <tr><td>#1041</td><td>Anele K.</td><td>R180</td><td><span class="badge badge-blue">Processing</span></td></tr>
-            <tr><td>#1040</td><td>Fatima D.</td><td>R310</td><td><span class="badge badge-amber">Pending</span></td></tr>
-            <tr><td>#1039</td><td>Thabo N.</td><td>R95</td><td><span class="badge badge-green">Delivered</span></td></tr>
-            <tr><td>#1038</td><td>Nomsa K.</td><td>R420</td><td><span class="badge badge-amber">Pending</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- My Listings -->
-      <div class="section-card">
-        <div class="section-card-title">My Listings</div>
-        <div id="farmer-listings"></div>
+        <div class="section-card-title">Your Listings</div>
+        <div id="farmer-products-list" style="margin-top:12px">
+          <div style="text-align:center;padding:24px;color:var(--gray-400)">Loading…</div>
+        </div>
       </div>
     </div>
 
-    <!-- Farm Map -->
-    <div class="section-card" style="margin-top:20px">
-      <div class="section-card-title">Your farm location</div>
-      <div class="map-container" style="height:200px">
-        <div style="width:100%;height:100%;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px">
-          <div style="font-size:32px">📍</div>
-          <div style="font-size:13px;color:var(--gray-600)">Green Valley Farm, Mpumalanga</div>
-          <div style="font-size:11px;color:var(--gray-400)">Connect Google Maps API to show exact location</div>
+    <!-- ORDERS TAB -->
+    <div id="farmer-tab-orders" style="display:none">
+      <div class="section-card">
+        <div class="section-card-title">Orders for Your Products</div>
+        <div id="farmer-orders-list" style="margin-top:12px">
+          <div style="text-align:center;padding:24px;color:var(--gray-400)">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div id="farmer-tab-settings" style="display:none">
+      <div class="section-card">
+        <div class="section-card-title">Farm Settings</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:14px">
+          <div class="form-group"><label class="label">Full name</label><input id="settings-name" class="input" type="text" /></div>
+          <div class="form-group"><label class="label">Email</label><input id="settings-email" class="input" type="email" disabled style="opacity:0.6" /></div>
+          <div class="form-group"><label class="label">Phone</label><input id="settings-phone" class="input" type="tel" /></div>
+          <div class="form-group"><label class="label">Farm name</label><input id="settings-farm-name" class="input" type="text" /></div>
+          <div class="form-group"><label class="label">Location / Town</label><input id="settings-location" class="input" type="text" /></div>
+          <div class="form-group"><label class="label">What you grow</label><input id="settings-what-they-grow" class="input" type="text" /></div>
+          <button class="btn btn-primary" onclick="saveAccountSettings()">Save changes</button>
+          <button class="btn btn-outline" onclick="sendPasswordReset()" style="margin-top:4px">Send password reset email</button>
         </div>
       </div>
     </div>
@@ -481,10 +458,22 @@
       <div class="auth-logo"><div style="font-size:36px">🌿</div></div>
       <div class="auth-title">Welcome back</div>
       <div class="auth-sub">Sign in to Fresh Farm Connect</div>
-      <div class="auth-toggle">
-        <button class="auth-toggle-btn active" data-role="buyer" onclick="toggleAuthRole(this,'buyer')">Buyer</button>
-        <button class="auth-toggle-btn" data-role="farmer" onclick="toggleAuthRole(this,'farmer')">Farmer</button>
+
+      <!-- Role selector -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+        <div id="login-buyer-tab" onclick="switchLoginTab('buyer')" style="border:2px solid var(--green-600);border-radius:var(--radius-sm);padding:12px;text-align:center;cursor:pointer;background:var(--green-50)">
+          <div style="font-size:22px;margin-bottom:4px">🛒</div>
+          <div style="font-size:13px;font-weight:600;color:var(--green-700)">Buyer</div>
+          <div style="font-size:11px;color:var(--gray-500)">Shop fresh produce</div>
+        </div>
+        <div id="login-farmer-tab" onclick="switchLoginTab('farmer')" style="border:2px solid var(--gray-200);border-radius:var(--radius-sm);padding:12px;text-align:center;cursor:pointer;background:white">
+          <div style="font-size:22px;margin-bottom:4px">👨🏿‍🌾</div>
+          <div style="font-size:13px;font-weight:600;color:var(--gray-700)">Farmer</div>
+          <div style="font-size:11px;color:var(--gray-500)">Manage your farm</div>
+        </div>
       </div>
+      <input type="hidden" id="login-role" value="buyer" />
+
       <div class="form-group"><label class="label">Email address</label><input id="login-email" class="input" type="email" placeholder="you@email.com" /></div>
       <div class="form-group"><label class="label">Password</label><input id="login-password" class="input" type="password" placeholder="••••••••" /></div>
       <div style="text-align:right;margin-bottom:16px"><a style="font-size:13px;color:var(--green-600);cursor:pointer" onclick="handleForgotPassword()">Forgot password?</a></div>
@@ -494,47 +483,77 @@
         <span style="font-size:12px;color:var(--gray-400)">or continue with</span>
         <div style="flex:1;height:1px;background:var(--gray-200)"></div>
       </div>
-      <button onclick="handleGoogleSignIn()" style="width:100%;padding:11px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:500;color:var(--gray-700);transition:all 0.15s" onmouseover="this.style.background='var(--gray-50)'" onmouseout="this.style.background='white'">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+      <button onclick="handleGoogleSignIn()" style="width:100%;padding:11px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:500;color:var(--gray-700)" onmouseover="this.style.background='var(--gray-50)'" onmouseout="this.style.background='white'">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         Continue with Google
       </button>
-      <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-500)">Don't have an account? <a style="color:var(--green-600);cursor:pointer" onclick="showPage('signup')">Sign up</a></div>
+      <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-500)">Don't have an account?
+        <a style="color:var(--green-600);cursor:pointer" onclick="showPage('signup-buyer')"> Buyer sign up</a> ·
+        <a style="color:var(--green-600);cursor:pointer" onclick="showPage('signup-farmer')"> Farmer sign up</a>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ========== SIGNUP ========== -->
-<div id="page-signup" class="page">
+<!-- ========== BUYER SIGNUP ========== -->
+<div id="page-signup-buyer" class="page">
   <div class="auth-page">
     <div class="auth-card">
-      <div class="auth-logo"><div style="font-size:36px">🌿</div></div>
-      <div class="auth-title">Create account</div>
-      <div class="auth-sub">Join the Fresh Farm Connect community</div>
-      <div class="auth-toggle">
-        <button class="auth-toggle-btn active" data-role="buyer" onclick="toggleAuthRole(this,'buyer')">Buyer</button>
-        <button class="auth-toggle-btn" data-role="farmer" onclick="toggleAuthRole(this,'farmer')">Farmer</button>
-      </div>
-      <div class="form-group"><label class="label">Full name</label><input id="signup-name" class="input" type="text" placeholder="Your name" /></div>
-      <div class="form-group"><label class="label">Email address</label><input id="signup-email" class="input" type="email" placeholder="you@email.com" /></div>
-      <div class="form-group"><label class="label">Phone number</label><input id="signup-phone" class="input" type="tel" placeholder="082 000 0000" /></div>
-      <div id="farmer-extra-fields" class="hidden">
-        <div class="form-group"><label class="label">Farm name</label><input id="signup-farm-name" class="input" type="text" placeholder="e.g. Green Valley Farm" /></div>
-        <div class="form-group"><label class="label">Province / Location</label><input id="signup-farm-location" class="input" type="text" placeholder="e.g. Mpumalanga" /></div>
-        <div class="form-group"><label class="label">What do you grow?</label><input id="signup-farm-products" class="input" type="text" placeholder="e.g. Tomatoes, Spinach, Eggs" /></div>
-        <div style="background:var(--amber-400);border-radius:var(--radius-sm);padding:10px;font-size:12px;color:white;margin-bottom:14px">⚠️ As a farmer you agree to our 8% commission on all sales. Farmers keep 92% of their listed price.</div>
-      </div>
-      <div class="form-group"><label class="label">Password</label><input id="signup-password" class="input" type="password" placeholder="At least 8 characters" /></div>
-      <button id="signup-btn" class="btn btn-primary" style="width:100%;padding:12px" onclick="handleSignup()">Create account</button>
+      <div class="auth-logo"><div style="font-size:36px">🛒</div></div>
+      <div class="auth-title">Create Buyer Account</div>
+      <div class="auth-sub">Shop fresh produce from Vaal Region farmers</div>
+      <div class="form-group"><label class="label">Full name</label><input id="buyer-signup-name" class="input" type="text" placeholder="Your name" /></div>
+      <div class="form-group"><label class="label">Email address</label><input id="buyer-signup-email" class="input" type="email" placeholder="you@email.com" /></div>
+      <div class="form-group"><label class="label">Phone number</label><input id="buyer-signup-phone" class="input" type="tel" placeholder="082 000 0000" /></div>
+      <div class="form-group"><label class="label">Password</label><input id="buyer-signup-password" class="input" type="password" placeholder="At least 8 characters" /></div>
+      <button id="buyer-signup-btn" class="btn btn-primary" style="width:100%;padding:12px" onclick="handleBuyerSignup()">Create Buyer Account</button>
       <div style="display:flex;align-items:center;gap:10px;margin:16px 0">
         <div style="flex:1;height:1px;background:var(--gray-200)"></div>
         <span style="font-size:12px;color:var(--gray-400)">or continue with</span>
         <div style="flex:1;height:1px;background:var(--gray-200)"></div>
       </div>
-      <button onclick="handleGoogleSignIn()" style="width:100%;padding:11px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:500;color:var(--gray-700);transition:all 0.15s" onmouseover="this.style.background='var(--gray-50)'" onmouseout="this.style.background='white'">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+      <button onclick="handleGoogleSignIn()" style="width:100%;padding:11px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:500;color:var(--gray-700)" onmouseover="this.style.background='var(--gray-50)'" onmouseout="this.style.background='white'">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         Continue with Google
       </button>
       <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-500)">Already have an account? <a style="color:var(--green-600);cursor:pointer" onclick="showPage('login')">Sign in</a></div>
+      <div style="text-align:center;margin-top:8px;font-size:13px;color:var(--gray-500)">Are you a farmer? <a style="color:var(--green-600);cursor:pointer" onclick="showPage('signup-farmer')">Register your farm →</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== FARMER SIGNUP ========== -->
+<div id="page-signup-farmer" class="page">
+  <div class="auth-page">
+    <div class="auth-card" style="max-width:480px">
+      <div class="auth-logo"><div style="font-size:36px">👨🏿‍🌾</div></div>
+      <div class="auth-title">Register Your Farm</div>
+      <div class="auth-sub">Sell your fresh produce directly to buyers in the Vaal Region</div>
+      <div style="background:var(--green-50);border:1px solid var(--green-200);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--green-700);margin-bottom:16px">
+        ✅ Farmers keep <strong>92%</strong> of every sale. We take 8% commission + R45 delivery fee.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label class="label">Full name</label><input id="farmer-signup-name" class="input" type="text" placeholder="Your name" /></div>
+        <div class="form-group"><label class="label">Phone number</label><input id="farmer-signup-phone" class="input" type="tel" placeholder="082 000 0000" /></div>
+      </div>
+      <div class="form-group"><label class="label">Email address</label><input id="farmer-signup-email" class="input" type="email" placeholder="you@email.com" /></div>
+      <div class="form-group"><label class="label">Farm name</label><input id="farmer-signup-farm-name" class="input" type="text" placeholder="e.g. Green Valley Farm" /></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label class="label">Area / Town</label><input id="farmer-signup-location" class="input" type="text" placeholder="e.g. Vanderbijlpark" /></div>
+        <div class="form-group"><label class="label">Province</label>
+          <select id="farmer-signup-province" class="input">
+            <option value="">Province</option>
+            <option>Gauteng</option><option>Western Cape</option><option>KwaZulu-Natal</option>
+            <option>Eastern Cape</option><option>Limpopo</option><option>Mpumalanga</option>
+            <option>North West</option><option>Free State</option><option>Northern Cape</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="label">What do you grow / sell?</label><input id="farmer-signup-products" class="input" type="text" placeholder="e.g. Tomatoes, Spinach, Eggs" /></div>
+      <div class="form-group"><label class="label">Password</label><input id="farmer-signup-password" class="input" type="password" placeholder="At least 8 characters" /></div>
+      <button id="farmer-signup-btn" class="btn btn-primary" style="width:100%;padding:12px" onclick="handleFarmerSignup()">Register Farm</button>
+      <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-500)">Already registered? <a style="color:var(--green-600);cursor:pointer" onclick="showPage('login')">Sign in</a></div>
+      <div style="text-align:center;margin-top:8px;font-size:13px;color:var(--gray-500)">Shopping instead? <a style="color:var(--green-600);cursor:pointer" onclick="showPage('signup-buyer')">Buyer sign up →</a></div>
     </div>
   </div>
 </div>
@@ -573,7 +592,7 @@
           <div class="section-card-title">Delivery Address</div>
           <div class="form-group" style="margin-top:12px">
             <label class="label">Full delivery address</label>
-            <textarea id="settings-address" class="input" rows="3" placeholder="e.g. 12 Main Street, Sandton, Johannesburg, 2196" style="resize:vertical"></textarea>
+            <textarea id="settings-address" class="input" rows="3" placeholder="e.g. 12 Frikkie Meyer Blvd, Vanderbijlpark, 1911" style="resize:vertical"></textarea>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div class="form-group">
