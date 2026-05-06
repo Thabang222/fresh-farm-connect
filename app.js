@@ -290,37 +290,13 @@ let cart = [];
 let activeFilter = 'All';
 const COMMISSION_RATE = 0.10;
 
-// ============================================================
-//  DELIVERY ZONES — distance-based pricing from farm hub
-//  Vanderbijlpark → VUT area = R10
-//  Vereeniging / Three Rivers  = R20
-//  Sebokeng / Evaton / Sasolburg = R30
-// ============================================================
+// Delivery zones — Vaal Region
 const DELIVERY_ZONES = [
-  {
-    id: 'zone1',
-    label: 'Zone 1 — Vanderbijlpark & VUT',
-    fee: 10,
-    keywords: ['vanderbijlpark','vanderbijl park','vut','vaal university','frikkie meyer','tshepiso','boipatong','bophelong'],
-    description: 'Vanderbijlpark / VUT area — R10',
-  },
-  {
-    id: 'zone2',
-    label: 'Zone 2 — Vereeniging & Three Rivers',
-    fee: 20,
-    keywords: ['vereeniging','three rivers','bedworth','roshnee','duncanville'],
-    description: 'Vereeniging / Three Rivers — R20',
-  },
-  {
-    id: 'zone3',
-    label: 'Zone 3 — Sebokeng, Evaton & surrounds',
-    fee: 30,
-    keywords: ['sebokeng','evaton','orange farm','meyerton','henley on klip','henley-on-klip','walkerville','sasolburg'],
-    description: 'Sebokeng / Evaton / Sasolburg — R30',
-  },
+  { id:'zone1', fee:10, keywords:['vanderbijlpark','vanderbijl park','vut','vaal university','frikkie meyer','tshepiso','boipatong','bophelong'], description:'Vanderbijlpark / VUT — R10' },
+  { id:'zone2', fee:20, keywords:['vereeniging','three rivers','bedworth','roshnee','duncanville'], description:'Vereeniging / Three Rivers — R20' },
+  { id:'zone3', fee:30, keywords:['sebokeng','evaton','orange farm','meyerton','henley on klip','henley-on-klip','walkerville','sasolburg'], description:'Sebokeng / Evaton / Sasolburg — R30' },
 ];
-
-let currentDeliveryFee  = 0;    // updated when address is confirmed
+let currentDeliveryFee  = 0;
 let currentDeliveryZone = null;
 
 function detectDeliveryZone(address) {
@@ -336,19 +312,17 @@ function applyDeliveryZone(address) {
   const zone = detectDeliveryZone(address);
   currentDeliveryZone = zone;
   currentDeliveryFee  = zone ? zone.fee : 0;
-
-  const feeEl    = document.getElementById('co-delivery-fee');
-  const zoneEl   = document.getElementById('co-delivery-zone');
-  const feeCartEl = document.getElementById('sum-delivery');
-
+  const feeEl  = document.getElementById('co-delivery-fee');
+  const zoneEl = document.getElementById('co-delivery-zone');
+  const cartFeeEl = document.getElementById('sum-delivery');
   if (zone) {
     if (feeEl)    feeEl.textContent    = 'R' + zone.fee;
     if (zoneEl)   zoneEl.textContent   = zone.description;
-    if (feeCartEl) feeCartEl.textContent = 'R' + zone.fee;
+    if (cartFeeEl) cartFeeEl.textContent = 'R' + zone.fee;
   } else {
     if (feeEl)    feeEl.textContent    = 'TBD';
     if (zoneEl)   zoneEl.textContent   = 'Address outside known zones — we will confirm fee';
-    if (feeCartEl) feeCartEl.textContent = 'TBD';
+    if (cartFeeEl) cartFeeEl.textContent = 'TBD';
   }
   updateCheckoutTotals();
 }
@@ -498,8 +472,7 @@ function renderCart() {
   empty.classList.add('hidden'); content.classList.remove('hidden');
   const subtotal = cart.reduce((s,x) => s + x.price * x.qty, 0);
   const commission = subtotal * COMMISSION_RATE;
-  const deliveryDisplay = currentDeliveryFee > 0 ? 'R' + currentDeliveryFee : 'Calculated at checkout';
-  const total = subtotal + commission;
+  const total = subtotal + commission + currentDeliveryFee;
   document.getElementById('cart-items-list').innerHTML = cart.map(item => `
     <div class="cart-item">
       <div class="cart-item-img">${item.emoji}</div>
@@ -521,7 +494,7 @@ function renderCart() {
   document.getElementById('sum-subtotal').textContent = 'R' + subtotal.toFixed(2);
   document.getElementById('sum-commission').textContent = 'R' + commission.toFixed(2);
   document.getElementById('sum-delivery').textContent = currentDeliveryFee > 0 ? 'R' + currentDeliveryFee : 'Set at checkout';
-  document.getElementById('sum-total').textContent = 'R' + (total + currentDeliveryFee).toFixed(2);
+  document.getElementById('sum-total').textContent = 'R' + (subtotal + commission + currentDeliveryFee).toFixed(2);
 }
 
 function changeQty(id, delta) {
@@ -566,7 +539,6 @@ function renderCheckout() {
       if (typeof selectedDelivery !== 'undefined') {
         selectedDelivery = { address: currentProfile.delivery_address };
       }
-      // Apply zone fee based on saved address
       if (typeof applyDeliveryZone === 'function') applyDeliveryZone(currentProfile.delivery_address);
     }
   }
@@ -613,7 +585,7 @@ async function placeOrder() {
   const confirmTime  = document.getElementById('confirm-time');
   if (confirmId)    confirmId.textContent    = 'Order #' + shortId;
   if (confirmItems) confirmItems.textContent = cart.map(i => i.emoji + ' ' + i.name + ' ×' + i.qty).join(', ');
-  if (confirmTotal) confirmTotal.textContent = 'R' + cart.reduce((s,x) => s + x.price * x.qty, 0).toFixed(2) + (currentDeliveryFee > 0 ? ' + R' + currentDeliveryFee + ' delivery' : '');
+  if (confirmTotal) confirmTotal.textContent = 'R' + cart.reduce((s,x) => s + x.price * x.qty, 0).toFixed(2) + ' + R' + currentDeliveryFee + ' delivery';
   if (confirmTime)  confirmTime.textContent  = new Date().toLocaleTimeString('en-ZA', { hour:'2-digit', minute:'2-digit' });
 
   cart = [];
