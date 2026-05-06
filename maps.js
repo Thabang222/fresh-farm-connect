@@ -315,6 +315,7 @@ async function reverseGeocode(lat, lng, autoSave = false) {
     if (input)   input.value = address;
     if (display) display.textContent = address;
     if (selectedDelivery) selectedDelivery.address = address;
+    if (typeof applyDeliveryZone === 'function') applyDeliveryZone(address);
     if (autoSave) await autoSaveDeliveryAddress(address);
   } catch (e) {
     console.warn('Reverse geocode failed:', e);
@@ -385,6 +386,7 @@ async function searchDeliveryAddress(query) {
         const display = document.getElementById('delivery-address-display');
         if (input)   input.value = query;
         if (display) display.textContent = query;
+        if (typeof applyDeliveryZone === 'function') applyDeliveryZone(query);
         await autoSaveDeliveryAddress(query);
         return; // success — stop trying
       }
