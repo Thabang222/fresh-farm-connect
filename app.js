@@ -1,33 +1,289 @@
+// ============================================================
+//  AUTH — SEPARATE BUYER / FARMER FLOWS
+// ============================================================
+
+function switchLoginTab(role) {
+  const buyerTab   = document.getElementById('login-buyer-tab');
+  const farmerTab  = document.getElementById('login-farmer-tab');
+  const roleInput  = document.getElementById('login-role');
+  if (!buyerTab || !farmerTab) return;
+  if (role === 'buyer') {
+    buyerTab.style.border  = '2px solid var(--green-600)';
+    buyerTab.style.background = 'var(--green-50)';
+    farmerTab.style.border = '2px solid var(--gray-200)';
+    farmerTab.style.background = 'white';
+  } else {
+    farmerTab.style.border  = '2px solid var(--green-600)';
+    farmerTab.style.background = 'var(--green-50)';
+    buyerTab.style.border = '2px solid var(--gray-200)';
+    buyerTab.style.background = 'white';
+  }
+  if (roleInput) roleInput.value = role;
+}
+
+async function handleBuyerSignup() {
+  const name     = document.getElementById('buyer-signup-name')?.value?.trim();
+  const email    = document.getElementById('buyer-signup-email')?.value?.trim();
+  const phone    = document.getElementById('buyer-signup-phone')?.value?.trim();
+  const password = document.getElementById('buyer-signup-password')?.value;
+  if (!name || !email || !password) { showToast('Please fill in all required fields', 'error'); return; }
+  if (password.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+
+  const btn = document.getElementById('buyer-signup-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Creating account…'; }
+
+  const { data, error } = await db.auth.signUp({
+    email, password,
+    options: { data: { role: 'buyer', name } }
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Create Buyer Account'; }
+  if (error) { showToast(error.message, 'error'); return; }
+
+  await new Promise(r => setTimeout(r, 800));
+  if (phone && data.user?.id) {
+    await db.from('buyers').update({ phone }).eq('id', data.user.id);
+  }
+  showToast('Welcome to Fresh Farm Connect! 🛒', 'success');
+  showPage('marketplace');
+}
+
+async function handleFarmerSignup() {
+  const name      = document.getElementById('farmer-signup-name')?.value?.trim();
+  const email     = document.getElementById('farmer-signup-email')?.value?.trim();
+  const phone     = document.getElementById('farmer-signup-phone')?.value?.trim();
+  const farmName  = document.getElementById('farmer-signup-farm-name')?.value?.trim();
+  const location  = document.getElementById('farmer-signup-location')?.value?.trim();
+  const province  = document.getElementById('farmer-signup-province')?.value;
+  const products  = document.getElementById('farmer-signup-products')?.value?.trim();
+  const password  = document.getElementById('farmer-signup-password')?.value;
+
+  if (!name || !email || !password || !farmName) { showToast('Please fill in all required fields', 'error'); return; }
+  if (password.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+
+  const btn = document.getElementById('farmer-signup-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Registering…'; }
+
+  const { data, error } = await db.auth.signUp({
+    email, password,
+    options: { data: { role: 'farmer', name, farm_name: farmName } }
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Register Farm'; }
+  if (error) { showToast(error.message, 'error'); return; }
+
+  await new Promise(r => setTimeout(r, 800));
+  if (data.user?.id) {
+    await db.from('farmers').update({
+      phone: phone || null,
+      location: location || null,
+      province: province || null,
+      what_they_grow: products || null,
+    }).eq('id', data.user.id);
+  }
+  showToast('Farm registered! Welcome 👨🏿‍🌾', 'success');
+  showPage('dashboard');
+}
+
+// ============================================================
+//  FARMER DASHBOARD — upload products, view orders
+// ============================================================
+async function renderFarmerDashboard() {
+  if (!currentUser || currentRole !== 'farmer') return;
+
+  // Fill farm info
+  const nameEl = document.getElementById('farmer-dash-name');
+  const farmEl = document.getElementById('farmer-dash-farm');
+  const locEl  = document.getElementById('farmer-dash-location');
+  if (nameEl) nameEl.textContent = currentProfile?.name || 'Farmer';
+  if (farmEl) farmEl.textContent = currentProfile?.farm_name || 'My Farm';
+  if (locEl)  locEl.textContent  = currentProfile?.location || 'Vaal Region';
+
+  // Load farmer's own products from Supabase
+  const { data: myProducts } = await db
+    .from('products')
+    .select('*')
+    .eq('farmer_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  const listEl = document.getElementById('farmer-products-list');
+  if (listEl) {
+    if (!myProducts || myProducts.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--gray-400)">No products yet. Add your first listing below.</div>';
+    } else {
+      listEl.innerHTML = myProducts.map(p => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--gray-50);border-radius:var(--radius-sm);margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:20px">${p.emoji || '🌱'}</span>
+            <div>
+              <div style="font-weight:600;font-size:14px">${p.name}</div>
+              <div style="font-size:12px;color:var(--gray-500)">R${p.price}/${p.unit} · ${p.stock} ${p.unit}s · ${p.category}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <span class="badge ${p.active ? 'badge-green' : 'badge-red'}">${p.active ? 'Live' : 'Hidden'}</span>
+            <button onclick="toggleProductActive('${p.id}', ${p.active})" style="background:none;border:1px solid var(--gray-200);border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer">${p.active ? 'Hide' : 'Show'}</button>
+            <button onclick="deleteFarmerProduct('${p.id}')" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--gray-400)'">🗑</button>
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  // Load orders for this farmer's products
+  await loadFarmerOrders();
+}
+
+async function loadFarmerOrders() {
+  const el = document.getElementById('farmer-orders-list');
+  if (!el || !currentUser) return;
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400)">Loading…</div>';
+
+  // Get orders that contain products from this farmer
+  const { data: orders } = await db
+    .from('orders')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (!orders || orders.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400)">No orders yet</div>';
+    return;
+  }
+
+  // Filter orders that contain this farmer's products
+  const { data: myProducts } = await db.from('products').select('id,name').eq('farmer_id', currentUser.id);
+  const myProductIds = (myProducts || []).map(p => String(p.id));
+
+  const myOrders = orders.filter(o =>
+    (o.items || []).some(i => myProductIds.includes(String(i.id)))
+  );
+
+  if (myOrders.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400)">No orders for your products yet</div>';
+    return;
+  }
+
+  el.innerHTML = myOrders.map(o => {
+    const myItems = (o.items || []).filter(i => myProductIds.includes(String(i.id)));
+    const myTotal = myItems.reduce((s, i) => s + i.price * i.qty, 0);
+    const date = new Date(o.created_at).toLocaleDateString('en-ZA', { day:'numeric', month:'short' });
+    const shortId = String(o.id).slice(0,8).toUpperCase();
+    const statusColors = { pending:'badge-blue', confirmed:'badge-blue', delivered:'badge-green', cancelled:'badge-red' };
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--gray-50);border-radius:var(--radius-sm);margin-bottom:8px">
+      <div>
+        <div style="font-weight:600;font-size:13px">#${shortId} — ${myItems.map(i=>i.name).join(', ')}</div>
+        <div style="font-size:12px;color:var(--gray-500)">${date} · ${o.buyer_name || 'Buyer'} · ${o.delivery_address?.split(',')[0] || ''}</div>
+        <div style="font-size:13px;color:var(--green-700);font-weight:500">Your cut: R${(myTotal * 0.92).toFixed(2)}</div>
+      </div>
+      <span class="badge ${statusColors[o.status] || 'badge-blue'}">${o.status}</span>
+    </div>`;
+  }).join('');
+}
+
+async function toggleProductActive(id, currentState) {
+  await db.from('products').update({ active: !currentState }).eq('id', id).eq('farmer_id', currentUser.id);
+  renderFarmerDashboard();
+}
+
+async function deleteFarmerProduct(id) {
+  if (!confirm('Remove this product from your listings?')) return;
+  await db.from('products').delete().eq('id', id).eq('farmer_id', currentUser.id);
+  showToast('Product removed', 'success');
+  renderFarmerDashboard();
+}
+
+async function addFarmerProduct() {
+  const name     = document.getElementById('fp-name')?.value?.trim();
+  const price    = parseFloat(document.getElementById('fp-price')?.value);
+  const unit     = document.getElementById('fp-unit')?.value?.trim();
+  const stock    = parseInt(document.getElementById('fp-stock')?.value);
+  const category = document.getElementById('fp-category')?.value;
+  const emoji    = document.getElementById('fp-emoji')?.value?.trim() || '🌱';
+  const imageUrl = document.getElementById('fp-image')?.value?.trim() || null;
+
+  if (!name || !price || !unit || !stock || !category) {
+    showToast('Please fill in all product fields', 'error'); return;
+  }
+
+  const btn = document.getElementById('fp-add-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Adding…'; }
+
+  const { error } = await db.from('products').insert({
+    farmer_id:   currentUser.id,
+    name, price, unit, stock, category, emoji,
+    image_url:   imageUrl,
+    active:      true,
+    organic:     false,
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Add Product'; }
+
+  if (error) { showToast('Failed to add: ' + error.message, 'error'); return; }
+
+  // Clear form
+  ['fp-name','fp-price','fp-unit','fp-stock','fp-emoji','fp-image'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  showToast('✅ ' + name + ' added to your listings!', 'success');
+  renderFarmerDashboard();
+}
+
+function switchFarmerTab(tab) {
+  ['products','orders','settings'].forEach(t => {
+    const el = document.getElementById('farmer-tab-' + t);
+    const btn = document.getElementById('farmer-tab-btn-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+    if (btn) {
+      btn.style.background  = t === tab ? 'var(--green-600)' : 'transparent';
+      btn.style.color       = t === tab ? 'white' : 'var(--gray-600)';
+    }
+  });
+}
 // DATA
 const products = [
-  {id:'1',name:'Roma Tomatoes',price:22,unit:'kg',farmer:'Green Valley Farm',location:'Vaal Region',emoji:'🍅',image:'https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=400&q=80',stock:28,category:'Vegetables',organic:true},
-  {id:'2',name:'Baby Spinach',price:35,unit:'bag',farmer:'Sunrise Organics',location:'Vaal Region',emoji:'🥬',image:'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&q=80',stock:15,category:'Vegetables',organic:true},
-  {id:'3',name:'Free-range Eggs',price:85,unit:'dozen',farmer:'Happy Hen Farm',location:'Vaal Region',emoji:'🥚',image:'https://images.unsplash.com/photo-1518569656558-1f25e69d2049?w=400&q=80',stock:8,category:'Dairy',organic:false},
-  {id:'4',name:'Strawberries',price:55,unit:'punnet',farmer:'Berry Bliss Farm',location:'Vaal Region',emoji:'🍓',image:'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=400&q=80',stock:20,category:'Fruits',organic:true},
-  {id:'5',name:'Raw Honey',price:120,unit:'jar',farmer:'Golden Hive',location:'Vaal Region',emoji:'🍯',image:'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&q=80',stock:12,category:'Herbs',organic:true},
-  {id:'6',name:'Butternut Squash',price:18,unit:'each',farmer:'Green Valley Farm',location:'Vaal Region',emoji:'🎃',image:'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=400&q=80',stock:30,category:'Vegetables',organic:false},
-  {id:'7',name:'Avocados',price:12,unit:'each',farmer:'Avo Grove',location:'Vaal Region',emoji:'🥑',image:'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=400&q=80',stock:45,category:'Fruits',organic:true},
-  {id:'8',name:'Fresh Milk',price:25,unit:'litre',farmer:'Meadow Dairy',location:'Vaal Region',emoji:'🥛',image:'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&q=80',stock:20,category:'Dairy',organic:false},
-  {id:'9',name:'Sweet Corn',price:8,unit:'each',farmer:'Sunrise Organics',location:'Vaal Region',emoji:'🌽',image:'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400&q=80',stock:60,category:'Vegetables',organic:false},
-  {id:'10',name:'Fresh Basil',price:25,unit:'bunch',farmer:'Herb Haven',location:'Vaal Region',emoji:'🌿',image:'https://images.unsplash.com/photo-1618375531912-867984bdfd87?w=400&q=80',stock:10,category:'Herbs',organic:true},
-  {id:'11',name:'Wheat Flour',price:45,unit:'2kg bag',farmer:'Mill Stone Farm',location:'Vaal Region',emoji:'🌾',image:'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&q=80',stock:25,category:'Grains',organic:false},
-  {id:'12',name:'Peaches',price:40,unit:'kg',farmer:'Orchard Gold',location:'Vaal Region',emoji:'🍑',image:'https://images.unsplash.com/photo-1629828874514-f0771c8d5e91?w=400&q=80',stock:18,category:'Fruits',organic:false},
+  // Vegetables — priced like Joburg fresh produce markets / Shoprite / Checkers
+  {id:'1',  name:'Tomatoes',         price:14, unit:'kg',     farmer:'Green Valley Farm',  location:'Vaal Region', emoji:'🍅', image:'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&q=80', stock:40, category:'Vegetables', organic:false},
+  {id:'2',  name:'Spinach',          price:10, unit:'bunch',  farmer:'Sunrise Organics',   location:'Vaal Region', emoji:'🥬', image:'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&q=80', stock:25, category:'Vegetables', organic:false},
+  {id:'3',  name:'Cabbage',          price:12, unit:'head',   farmer:'Green Valley Farm',  location:'Vaal Region', emoji:'🥦', image:'https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=400&q=80', stock:30, category:'Vegetables', organic:false},
+  {id:'4',  name:'Butternut',        price:15, unit:'each',   farmer:'Green Valley Farm',  location:'Vaal Region', emoji:'🎃', image:'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=400&q=80', stock:35, category:'Vegetables', organic:false},
+  {id:'5',  name:'Onions',           price:12, unit:'kg',     farmer:'Sunrise Organics',   location:'Vaal Region', emoji:'🧅', image:'https://images.unsplash.com/photo-1508747703725-719777637510?w=400&q=80', stock:50, category:'Vegetables', organic:false},
+  {id:'6',  name:'Green Pepper',     price:18, unit:'kg',     farmer:'Happy Hen Farm',     location:'Vaal Region', emoji:'🫑', image:'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=400&q=80', stock:20, category:'Vegetables', organic:false},
+  {id:'7',  name:'Sweet Potato',     price:14, unit:'kg',     farmer:'Meadow Dairy',       location:'Vaal Region', emoji:'🍠', image:'https://images.unsplash.com/photo-1596097635121-14b38c5d7a27?w=400&q=80', stock:45, category:'Vegetables', organic:false},
+  {id:'8',  name:'Beetroot',         price:12, unit:'bunch',  farmer:'Sunrise Organics',   location:'Vaal Region', emoji:'🫀', image:'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=400&q=80', stock:20, category:'Vegetables', organic:false},
+  {id:'9',  name:'Carrots',          price:10, unit:'bunch',  farmer:'Green Valley Farm',  location:'Vaal Region', emoji:'🥕', image:'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&q=80', stock:40, category:'Vegetables', organic:false},
+  {id:'10', name:'Mealies (Corn)',   price:5,  unit:'each',   farmer:'Sunrise Organics',   location:'Vaal Region', emoji:'🌽', image:'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400&q=80', stock:60, category:'Vegetables', organic:false},
+  {id:'11', name:'Pumpkin',          price:20, unit:'each',   farmer:'Green Valley Farm',  location:'Vaal Region', emoji:'🎃', image:'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=400&q=80', stock:15, category:'Vegetables', organic:false},
+  {id:'12', name:'Green Beans',      price:16, unit:'kg',     farmer:'Berry Bliss Farm',   location:'Vaal Region', emoji:'🫘', image:'https://images.unsplash.com/photo-1567375698348-5d9d5ae99de0?w=400&q=80', stock:25, category:'Vegetables', organic:false},
+  // Fruits
+  {id:'13', name:'Bananas',          price:18, unit:'kg',     farmer:'Golden Hive',        location:'Vaal Region', emoji:'🍌', image:'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&q=80', stock:40, category:'Fruits',     organic:false},
+  {id:'14', name:'Apples',           price:28, unit:'kg',     farmer:'Orchard Gold',       location:'Vaal Region', emoji:'🍎', image:'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=400&q=80', stock:30, category:'Fruits',     organic:false},
+  {id:'15', name:'Oranges',          price:20, unit:'kg',     farmer:'Orchard Gold',       location:'Vaal Region', emoji:'🍊', image:'https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=400&q=80', stock:35, category:'Fruits',     organic:false},
+  {id:'16', name:'Avocados',         price:10, unit:'each',   farmer:'Avo Grove',          location:'Vaal Region', emoji:'🥑', image:'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=400&q=80', stock:50, category:'Fruits',     organic:false},
+  {id:'17', name:'Mangoes',          price:12, unit:'each',   farmer:'Golden Hive',        location:'Vaal Region', emoji:'🥭', image:'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&q=80', stock:30, category:'Fruits',     organic:false},
+  {id:'18', name:'Watermelon',       price:35, unit:'each',   farmer:'Berry Bliss Farm',   location:'Vaal Region', emoji:'🍉', image:'https://images.unsplash.com/photo-1568909344668-6f14a07b56a0?w=400&q=80', stock:12, category:'Fruits',     organic:false},
+  // Eggs & Dairy
+  {id:'19', name:'Free-range Eggs',  price:75, unit:'dozen',  farmer:'Happy Hen Farm',     location:'Vaal Region', emoji:'🥚', image:'https://images.unsplash.com/photo-1491524062933-cb0289261700?w=400&q=80', stock:20, category:'Eggs',       organic:false},
+  {id:'20', name:'Farm Eggs (6)',    price:40, unit:'pack',   farmer:'Happy Hen Farm',     location:'Vaal Region', emoji:'🥚', image:'https://images.unsplash.com/photo-1498654077810-12c21d4d6dc3?w=400&q=80', stock:30, category:'Eggs',       organic:false},
 ];
 
 const farmers = [
-  {name:'Thabo Nkosi',farm:'Green Valley Farm',location:'Mpumalanga',emoji:'👨🏿‍🌾',tags:['Vegetables','Organic'],products:12,rating:4.9,since:2019},
-  {name:'Amara Dlamini',farm:'Sunrise Organics',location:'KwaZulu-Natal',emoji:'👩🏾‍🌾',tags:['Vegetables','Herbs','Organic'],products:8,rating:4.8,since:2021},
-  {name:'Pieter van Wyk',farm:'Happy Hen Farm',location:'Western Cape',emoji:'👨🏻‍🌾',tags:['Poultry','Eggs'],products:5,rating:5.0,since:2018},
-  {name:'Nomsa Khumalo',farm:'Berry Bliss Farm',location:'Limpopo',emoji:'👩🏿‍🌾',tags:['Fruits','Berries'],products:6,rating:4.7,since:2020},
-  {name:'Rajesh Pillay',farm:'Golden Hive',location:'Gauteng',emoji:'👨🏽‍🌾',tags:['Honey','Beeswax'],products:3,rating:4.9,since:2017},
-  {name:'Maria Ferreira',farm:'Meadow Dairy',location:'Free State',emoji:'👩🏼‍🌾',tags:['Dairy','Organic'],products:7,rating:4.8,since:2016},
+  {name:'Thabo Nkosi',      farm:'Green Valley Farm', location:'Vanderbijlpark, Vaal', emoji:'👨🏿‍🌾', tags:['Vegetables','Fruits'],  products:11, rating:4.9, since:2019},
+  {name:'Amara Dlamini',    farm:'Sunrise Organics',  location:'Vereeniging, Vaal',    emoji:'👩🏾‍🌾', tags:['Vegetables','Mealies'], products:5,  rating:4.8, since:2021},
+  {name:'Pieter van Wyk',   farm:'Happy Hen Farm',    location:'Meyerton, Vaal',       emoji:'👨🏻‍🌾', tags:['Eggs','Poultry'],       products:2,  rating:5.0, since:2018},
+  {name:'Nomsa Khumalo',    farm:'Berry Bliss Farm',  location:'Three Rivers, Vaal',   emoji:'👩🏿‍🌾', tags:['Fruits','Vegetables'],  products:3,  rating:4.7, since:2020},
+  {name:'Rajesh Pillay',    farm:'Golden Hive',       location:'Sebokeng, Vaal',       emoji:'👨🏽‍🌾', tags:['Fruits','Bananas'],     products:2,  rating:4.9, since:2017},
+  {name:'Maria Ferreira',   farm:'Orchard Gold',      location:'Sasolburg, Vaal',      emoji:'👩🏼‍🌾', tags:['Fruits','Apples'],      products:2,  rating:4.8, since:2016},
+  {name:'Sipho Mahlangu',   farm:'Avo Grove',         location:'Vanderbijlpark, Vaal', emoji:'👨🏿‍🌾', tags:['Avocados','Fruits'],    products:1,  rating:4.9, since:2020},
+  {name:'Lerato Mokoena',   farm:'Meadow Dairy',      location:'Vereeniging, Vaal',    emoji:'👩🏾‍🌾', tags:['Sweet Potato','Veg'],   products:1,  rating:4.7, since:2022},
 ];
 
 const farmerListings = [
-  {emoji:'🍅',name:'Roma Tomatoes',stock:'28 kg in stock',price:'R22/kg',low:false},
-  {emoji:'🥬',name:'Baby Spinach',stock:'15 bags in stock',price:'R35/bag',low:false},
-  {emoji:'🥚',name:'Free-range Eggs',stock:'8 dozen remaining',price:'R85/doz',low:true},
-  {emoji:'🌿',name:'Fresh Basil',stock:'3 bunches left',price:'R25/bunch',low:true},
+  {emoji:'🍅',name:'Tomatoes',       stock:'40 kg in stock',    price:'R14/kg',   low:false},
+  {emoji:'🥬',name:'Spinach',        stock:'25 bunches in stock',price:'R10/bunch',low:false},
+  {emoji:'🥚',name:'Free-range Eggs',stock:'8 dozen remaining',  price:'R75/doz',  low:true},
+  {emoji:'🥕',name:'Carrots',        stock:'3 bunches left',     price:'R10/bunch',low:true},
 ];
 
 let cart = [];
@@ -42,36 +298,40 @@ function showPage(name) {
   const page = document.getElementById('page-' + name);
   if (page) page.classList.add('active');
   window.scrollTo(0,0);
-  if (name === 'marketplace') renderProducts(products);
+  if (name === 'marketplace') {
+    renderProducts(products);
+    setTimeout(() => { if (typeof initMaps === 'function') initMaps('marketplace'); }, 150);
+  }
   if (name === 'home') {
     renderFeatured();
-    setTimeout(() => { if (typeof initMaps === 'function') initMaps('home'); }, 150);
+    setTimeout(() => { if (typeof initMaps === 'function') initMaps('home'); }, 200);
   }
   if (name === 'farmers') renderFarmers();
   if (name === 'cart') renderCart();
   if (name === 'checkout') {
     if (typeof currentUser === 'undefined' || !currentUser) {
       showToast('Please sign in to checkout 🔒', 'error');
-      // Store intent so we can redirect back after login
       window._redirectAfterLogin = 'checkout';
       showPage('login');
       return;
     }
     renderCheckout();
+    setTimeout(() => { if (typeof initMaps === 'function') initMaps('checkout'); }, 150);
   }
-  if (name === 'dashboard') renderDashboard();
+  if (name === 'dashboard') {
+    if (currentRole === 'farmer') { renderFarmerDashboard(); }
+    else { renderDashboard(); }
+  }
   if (name === 'profile') renderProfilePage();
 }
 
 // PRODUCTS
 function renderProductCard(p) {
-  const imgSrc = p.image || '';
-  const imgHtml = imgSrc
-    ? `<img src="${imgSrc}" alt="${p.name}" class="product-img" onerror="this.parentElement.innerHTML='<div class=product-img-placeholder>${p.emoji}</div>'" />`
+  const imgHtml = p.image
+    ? `<img src="${p.image}" alt="${p.name}" class="product-img" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="product-img-placeholder" style="display:none">${p.emoji}</div>`
     : `<div class="product-img-placeholder">${p.emoji}</div>`;
   return `<div class="product-card" onclick="addToCart('${p.id}')">
     <div class="product-img-wrap">${imgHtml}</div>
-    ${p.organic ? '<div class="product-organic-badge">Organic</div>' : ''}
     <div class="product-body">
       <div class="product-cat">${p.category}</div>
       <div class="product-name">${p.name}</div>
@@ -217,11 +477,7 @@ function renderCheckout() {
   if (coCom) coCom.textContent = 'R' + commission.toFixed(2);
   if (coTot) coTot.textContent = 'R' + total.toFixed(2);
 
-  // Hide payment step initially
-  const payStep = document.getElementById('payment-step');
-  if (payStep) payStep.style.display = 'none';
-
-  // Pre-fill from saved profile
+  // Pre-fill delivery details from saved profile
   if (currentProfile) {
     const phoneEl = document.getElementById('checkout-phone');
     const addrEl  = document.getElementById('delivery-address-input');
@@ -230,36 +486,15 @@ function renderCheckout() {
     if (addrEl  && currentProfile.delivery_address) addrEl.value  = currentProfile.delivery_address;
     if (display && currentProfile.delivery_address) {
       display.textContent = '📍 ' + currentProfile.delivery_address;
+      // Pre-set selectedDelivery so order saves correctly
       if (typeof selectedDelivery !== 'undefined') {
         selectedDelivery = { address: currentProfile.delivery_address };
       }
     }
   }
 
-  // Init Leaflet map
-  setTimeout(() => { if (typeof initMaps === 'function') initMaps('checkout'); }, 150);
-}
-
-function confirmDeliveryAndPay() {
-  const delivery = typeof getDeliveryDetails === 'function' ? getDeliveryDetails() : null;
-  const manualAddr = document.getElementById('delivery-address-input')?.value?.trim();
-  const finalAddress = delivery?.address || manualAddr || currentProfile?.delivery_address;
-
-  if (!finalAddress || finalAddress === 'Click the map or search to set your delivery location') {
-    showToast('Please set your delivery address on the map first 📍', 'error'); return;
-  }
-
-  const phone = document.getElementById('checkout-phone')?.value?.trim() || currentProfile?.phone;
-  if (!phone) {
-    showToast('Please enter your phone number for delivery 📞', 'error'); return;
-  }
-
-  // Show payment step
-  const payStep = document.getElementById('payment-step');
-  const label   = document.getElementById('confirmed-address-label');
-  if (payStep) { payStep.style.display = 'block'; payStep.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-  if (label)   label.textContent = finalAddress;
-  showToast('Address confirmed! ✅ Now choose your payment method.', 'success');
+  // Init map after short delay so container is visible
+  setTimeout(() => { if (typeof initMaps === 'function') initMaps('checkout'); }, 100);
 }
 
 async function placeOrder() {
@@ -305,6 +540,7 @@ async function placeOrder() {
 
   cart = [];
   updateCartBadge();
+  clearGuestCart();
   showPage('confirmation');
   showToast('Order placed successfully! 🌿', 'success');
 }
@@ -382,10 +618,33 @@ function showToast(msg, type='') {
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
 }
 
+// GUEST CART — persist cart in localStorage for non-logged-in users
+function saveGuestCart() {
+  try { localStorage.setItem('ffc_guest_cart', JSON.stringify(cart)); } catch(e) {}
+}
+
+function loadGuestCart() {
+  try {
+    const saved = localStorage.getItem('ffc_guest_cart');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.length > 0) {
+        cart = parsed;
+        updateCartBadge();
+      }
+    }
+  } catch(e) {}
+}
+
+function clearGuestCart() {
+  try { localStorage.removeItem('ffc_guest_cart'); } catch(e) {}
+}
+
 // INIT
 (async () => {
+  // Load guest cart first so items show immediately
+  loadGuestCart();
   await initAuth();
-  // Try loading products from Supabase
   const dbProducts = await loadProducts();
   if (dbProducts && dbProducts.length > 0) {
     products.length = 0;
@@ -394,6 +653,8 @@ function showToast(msg, type='') {
   renderFeatured();
   renderFarmers();
   renderDashboard();
+  // Init hero map
+  setTimeout(() => { if (typeof initMaps === 'function') initMaps('home'); }, 200);
 })();
 
 
@@ -483,17 +744,12 @@ async function loadProfileOrders() {
     const statusClass = statusColors[o.status] || 'badge-blue';
     const statusLabel = statusLabels[o.status] || o.status;
     return `<div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--gray-50);border-radius:var(--radius-sm);margin-bottom:10px">
-      <div style="flex:1">
+      <div>
         <div style="font-weight:600;font-size:14px;color:var(--gray-900)">#${shortId} — ${itemNames}</div>
         <div style="font-size:12px;color:var(--gray-500);margin-top:2px">${date}</div>
         <div style="font-size:13px;color:var(--green-700);margin-top:4px;font-weight:500">R${Number(o.total).toFixed(2)} total</div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-        <span class="badge ${statusClass}">${statusLabel}</span>
-        <button onclick="deleteOrder('${o.id}')" title="Delete order"
-          style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--gray-400);padding:4px;border-radius:4px;transition:color 0.15s"
-          onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--gray-400)'">🗑</button>
-      </div>
+      <span class="badge ${statusClass}">${statusLabel}</span>
     </div>`;
   }).join('');
 }
@@ -544,23 +800,4 @@ async function sendPasswordReset() {
   const { error } = await db.auth.resetPasswordForEmail(email);
   if (error) { showToast(error.message, 'error'); return; }
   showToast('Password reset email sent to ' + email, 'success');
-}
-
-async function deleteOrder(orderId) {
-  if (!currentUser) return;
-  if (!confirm('Delete this order from your history?')) return;
-
-  const { error } = await db
-    .from('orders')
-    .delete()
-    .eq('id', orderId)
-    .eq('buyer_id', currentUser.id); // safety: only delete own orders
-
-  if (error) {
-    showToast('Failed to delete order: ' + error.message, 'error');
-    return;
-  }
-
-  showToast('Order removed from your history', 'success');
-  await loadProfileOrders(); // refresh the list
 }
