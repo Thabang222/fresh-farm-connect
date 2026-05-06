@@ -28,7 +28,24 @@ async function initAuth() {
       await handleOAuthRedirect();
       await resolveProfile(session.user);
       updateNav();
-      // If redirected back from Google, go to marketplace or intended page
+
+      // Merge guest cart into logged-in session
+      if (typeof loadGuestCart === 'function') {
+        const guestItems = (() => {
+          try { return JSON.parse(localStorage.getItem('ffc_guest_cart') || '[]'); } catch(e) { return []; }
+        })();
+        if (guestItems.length > 0 && typeof cart !== 'undefined') {
+          guestItems.forEach(gi => {
+            const existing = cart.find(c => c.id === gi.id);
+            if (existing) existing.qty += gi.qty;
+            else cart.push(gi);
+          });
+          if (typeof updateCartBadge === 'function') updateCartBadge();
+          if (typeof clearGuestCart === 'function') clearGuestCart();
+        }
+      }
+
+      // Redirect after login
       if (window.location.hash.includes('access_token')) {
         const redirect = window._redirectAfterLogin || 'marketplace';
         window._redirectAfterLogin = null;
@@ -38,11 +55,16 @@ async function initAuth() {
         const redirect = window._redirectAfterLogin;
         window._redirectAfterLogin = null;
         showPage(redirect);
+        showToast('Welcome back! 👋', 'success');
       }
     } else if (event === 'SIGNED_OUT') {
       currentUser = null;
       currentProfile = null;
       currentRole = null;
+      // Clear cart on sign out so orders don't show for guests
+      if (typeof cart !== 'undefined') { cart = []; }
+      if (typeof updateCartBadge === 'function') updateCartBadge();
+      if (typeof clearGuestCart === 'function') clearGuestCart();
       updateNav();
     }
   });
