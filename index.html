@@ -9,9 +9,6 @@
 </head>
 <body>
 
-</head>
-<body>
-
 <!-- TOAST -->
 <div id="toast-container"></div>
 
@@ -44,9 +41,9 @@
   <div class="commission-inner">
     <div class="commission-title">How we earn:</div>
     <div class="commission-items">
-      <div class="commission-item"><div class="commission-dot"></div> 8% commission on every sale</div>
-      <div class="commission-item"><div class="commission-dot"></div> R45 base delivery fee per order</div>
-      <div class="commission-item"><div class="commission-dot"></div> Farmers keep 92% of their sale price</div>
+      <div class="commission-item"><div class="commission-dot"></div> 10% commission on every sale</div>
+      <div class="commission-item"><div class="commission-dot"></div> R10–R30 delivery fee based on your area</div>
+      <div class="commission-item"><div class="commission-dot"></div> Farmers keep 90% of their sale price</div>
       <div class="commission-item"><div class="commission-dot"></div> PayFast processes all payments securely</div>
     </div>
   </div>
@@ -103,7 +100,7 @@
           <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         </div>
         <div class="how-title">Order & pay securely</div>
-        <div class="how-text">Add to cart and checkout via PayFast — card, EFT, or SnapScan. Transparent pricing with 8% commission and R45 delivery.</div>
+        <div class="how-text">Add to cart and checkout via PayFast — card, EFT, or SnapScan. Transparent pricing with 10% commission and distance-based delivery.</div>
       </div>
       <div class="how-card">
         <div class="how-icon">
@@ -139,8 +136,8 @@
         </div>
         <div>
           <div class="footer-heading">How we earn</div>
-          <div class="footer-link">8% sales commission</div>
-          <div class="footer-link">R45 delivery fee</div>
+          <div class="footer-link">10% sales commission</div>
+          <div class="footer-link">R10–R30 delivery fee</div>
           <div class="footer-link">PayFast payments</div>
         </div>
         <div>
@@ -229,10 +226,10 @@
           <div class="order-summary">
             <div class="summary-title">Order Summary</div>
             <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">R0</span></div>
-            <div class="summary-row commission-row"><span>Platform commission (8%)</span><span id="sum-commission">R0</span></div>
-            <div class="summary-row"><span>Delivery fee</span><span id="sum-delivery">R45</span></div>
+            <div class="summary-row commission-row"><span>Service fee (10%)</span><span id="sum-commission">R0</span></div>
+            <div class="summary-row"><span>Delivery fee</span><span id="sum-delivery">Set at checkout</span></div>
             <div class="summary-row total"><span>Total</span><span id="sum-total">R0</span></div>
-            <div class="summary-note">💡 8% commission supports our platform. Farmers receive 92% of the sale price. Delivery fee covers logistics from farm to your door.</div>
+            <div class="summary-note">💡 10% service fee supports our platform. Farmers receive 90% of the sale price. Delivery fee is R10–R30 based on your area.</div>
             <button class="btn btn-primary" style="width:100%;margin-top:16px;padding:12px" onclick="showPage('checkout')">Proceed to Checkout</button>
             <button class="btn btn-outline" style="width:100%;margin-top:8px" onclick="showPage('marketplace')">Continue Shopping</button>
           </div>
@@ -252,7 +249,10 @@
         <!-- STEP 1: Delivery Address -->
         <div class="card" style="padding:20px;margin-bottom:16px">
           <div style="font-weight:600;font-size:16px;margin-bottom:4px;color:var(--gray-900)">📍 Step 1 — Delivery Address</div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:14px">Search your address or click on the map to drop a pin. It saves automatically.</div>
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:10px">Search your address or click on the map to drop a pin. Delivery fee is calculated automatically.</div>
+          <div style="background:var(--green-50);border:1px solid var(--green-200);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--green-800)">
+            🚗 <strong>Delivery zones:</strong> &nbsp; Vanderbijlpark / VUT — <strong>R10</strong> &nbsp;·&nbsp; Vereeniging — <strong>R20</strong> &nbsp;·&nbsp; Sebokeng / Evaton — <strong>R30</strong>
+          </div>
 
           <!-- Address search -->
           <div style="display:flex;gap:8px;margin-bottom:12px">
@@ -302,11 +302,14 @@
           <div id="checkout-items" style="margin-bottom:12px;font-size:13px;color:var(--gray-600)"></div>
           <hr class="divider" />
           <div class="summary-row"><span>Subtotal</span><span id="co-subtotal">R0</span></div>
-          <div class="summary-row commission-row"><span>Commission (8%)</span><span id="co-commission">R0</span></div>
-          <div class="summary-row"><span>Delivery fee</span><span>R45</span></div>
+          <div class="summary-row commission-row"><span>Service fee (10%)</span><span id="co-commission">R0</span></div>
+          <div class="summary-row">
+            <span>Delivery fee<br><small id="co-delivery-zone" style="color:var(--gray-400);font-weight:400;font-size:11px">Set your address above</small></span>
+            <span id="co-delivery-fee">TBD</span>
+          </div>
           <div class="summary-row total"><span>Total</span><span id="co-total">R0</span></div>
           <button id="pay-btn" class="btn btn-primary" style="width:100%;margin-top:16px;padding:14px;font-size:15px" onclick="placeOrder()">Pay via PayFast →</button>
-          <div class="summary-note" style="margin-top:10px">By placing your order you agree to our terms. Farmers receive 92% of the sale price after our 8% platform commission.</div>
+          <div class="summary-note" style="margin-top:10px">By placing your order you agree to our terms. Farmers receive 90% of the sale price after our 10% platform commission.</div>
         </div>
       </div>
     </div>
@@ -378,7 +381,7 @@
 
     <!-- Commission banner -->
     <div style="background:var(--green-50);border:1px solid var(--green-200);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--green-700)">
-      💰 You keep <strong>92%</strong> of every sale. Platform takes 8% commission. R45 delivery fee is separate.
+      💰 You keep <strong>90%</strong> of every sale. Platform takes 10% commission. Delivery fee varies by zone (R10–R30).
     </div>
 
     <!-- TAB BUTTONS -->
@@ -528,7 +531,7 @@
       <div class="auth-title">Register Your Farm</div>
       <div class="auth-sub">Sell your fresh produce directly to buyers in the Vaal Region</div>
       <div style="background:var(--green-50);border:1px solid var(--green-200);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--green-700);margin-bottom:16px">
-        ✅ Farmers keep <strong>92%</strong> of every sale. We take 8% commission + R45 delivery fee.
+        ✅ Farmers keep <strong>90%</strong> of every sale. We take 10% commission + delivery fee (R10–R30).
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="form-group"><label class="label">Full name</label><input id="farmer-signup-name" class="input" type="text" placeholder="Your name" /></div>
@@ -669,7 +672,7 @@
       <div class="form-group"><label class="label">Unit</label><input class="input" type="text" placeholder="kg" id="new-unit" /></div>
     </div>
     <div class="form-group"><label class="label">Stock quantity</label><input class="input" type="number" placeholder="50" id="new-stock" /></div>
-    <div style="background:var(--green-50);border-radius:var(--radius-sm);padding:10px;font-size:12px;color:var(--green-700);margin-bottom:14px">💡 You earn 92% of your listed price after our 8% platform commission.</div>
+    <div style="background:var(--green-50);border-radius:var(--radius-sm);padding:10px;font-size:12px;color:var(--green-700);margin-bottom:14px">💡 You earn 90% of your listed price after our 10% platform commission.</div>
     <div style="display:flex;gap:10px">
       <button class="btn btn-primary" style="flex:1" onclick="addListing()">Publish listing</button>
       <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
@@ -683,4 +686,3 @@
 <script src="app.js"></script>
 </body>
 </html>
-  
