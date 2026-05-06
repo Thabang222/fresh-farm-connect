@@ -261,8 +261,9 @@ async function saveOrder(cart, deliveryAddress = null, phone = null) {
   if (!currentUser) return null;
 
   const subtotal   = cart.reduce((s, x) => s + x.price * x.qty, 0);
-  const commission = subtotal * COMMISSION_RATE;
-  const total      = subtotal + commission + DELIVERY_FEE;
+  const commission = subtotal * 0.10;
+  const deliveryFee = (typeof currentDeliveryFee !== 'undefined' ? currentDeliveryFee : 0);
+  const total      = subtotal + commission + deliveryFee;
 
   const { data: order, error } = await db.from('orders').insert({
     buyer_id:         currentUser.id,
@@ -273,7 +274,7 @@ async function saveOrder(cart, deliveryAddress = null, phone = null) {
     items:            cart,
     subtotal,
     commission,
-    delivery_fee:     DELIVERY_FEE,
+    delivery_fee:     deliveryFee,
     total,
     status:           'pending',
   }).select().single();
